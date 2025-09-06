@@ -7,14 +7,13 @@ class Migration_Create_users_table extends CI_Migration {
         $this->dbforge->add_field(array(
             'id' => array(
                 'type' => 'INT',
-                'constraint' => 11,
+                'constraint' => 5,
                 'unsigned' => TRUE,
                 'auto_increment' => TRUE
             ),
-            'username' => array(
+            'name' => array(
                 'type' => 'VARCHAR',
-                'constraint' => 50,
-                'unique' => TRUE
+                'constraint' => 100
             ),
             'email' => array(
                 'type' => 'VARCHAR',
@@ -25,18 +24,10 @@ class Migration_Create_users_table extends CI_Migration {
                 'type' => 'VARCHAR',
                 'constraint' => 255
             ),
-            'first_name' => array(
-                'type' => 'VARCHAR',
-                'constraint' => 50
-            ),
-            'last_name' => array(
-                'type' => 'VARCHAR',
-                'constraint' => 50
-            ),
             'role' => array(
                 'type' => 'ENUM',
-                'constraint' => array('student', 'instructor', 'admin'),
-                'default' => 'student'
+                'constraint' => array('admin', 'user'),
+                'default' => 'user'
             ),
             'created_at' => array(
                 'type' => 'DATETIME',

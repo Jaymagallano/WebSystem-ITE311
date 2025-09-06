@@ -11,36 +11,18 @@ class UserSeeder extends CI_Controller {
     public function seed() {
         $users = array(
             array(
-                'username' => 'admin',
-                'email' => 'admin@lms.com',
+                'name' => 'Admin User',
+                'email' => 'admin@test.com',
                 'password' => password_hash('admin123', PASSWORD_DEFAULT),
-                'first_name' => 'System',
-                'last_name' => 'Administrator',
-                'role' => 'admin'
+                'role' => 'admin',
+                'created_at' => date('Y-m-d H:i:s')
             ),
             array(
-                'username' => 'instructor1',
-                'email' => 'instructor1@lms.com',
-                'password' => password_hash('instructor123', PASSWORD_DEFAULT),
-                'first_name' => 'John',
-                'last_name' => 'Smith',
-                'role' => 'instructor'
-            ),
-            array(
-                'username' => 'student1',
-                'email' => 'student1@lms.com',
-                'password' => password_hash('student123', PASSWORD_DEFAULT),
-                'first_name' => 'Jane',
-                'last_name' => 'Doe',
-                'role' => 'student'
-            ),
-            array(
-                'username' => 'student2',
-                'email' => 'student2@lms.com',
-                'password' => password_hash('student123', PASSWORD_DEFAULT),
-                'first_name' => 'Bob',
-                'last_name' => 'Johnson',
-                'role' => 'student'
+                'name' => 'Test User',
+                'email' => 'user@test.com',
+                'password' => password_hash('user123', PASSWORD_DEFAULT),
+                'role' => 'user',
+                'created_at' => date('Y-m-d H:i:s')
             )
         );
         
