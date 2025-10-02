@@ -15,7 +15,7 @@ class Auth extends CI_Controller {
                     'name' => $this->input->post('name'),
                     'email' => $this->input->post('email'),
                     'password' => password_hash($this->input->post('password'), PASSWORD_DEFAULT),
-                    'role' => 'user',
+                    'role' => 'student',
                     'created_at' => date('Y-m-d H:i:s')
                 );
                 
@@ -30,17 +30,24 @@ class Auth extends CI_Controller {
     }
     
     public function login() {
+        // Prevent logged-in users from accessing login page
+        if ($this->session->userdata('logged_in')) {
+            redirect('dashboard');
+        }
+        
         if ($this->input->method() == 'post') {
-            $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
+            $this->form_validation->set_rules('email', 'Email', 'required|valid_email|trim');
             $this->form_validation->set_rules('password', 'Password', 'required');
             
             if ($this->form_validation->run()) {
-                $email = $this->input->post('email');
+                $email = $this->input->post('email', TRUE);
                 $password = $this->input->post('password');
                 
+                // Fetch user from database
                 $user = $this->db->get_where('users', array('email' => $email))->row();
                 
                 if ($user && password_verify($password, $user->password)) {
+                    // Create session data
                     $session_data = array(
                         'user_id' => $user->id,
                         'name' => $user->name,
@@ -51,6 +58,8 @@ class Auth extends CI_Controller {
                     
                     $this->session->set_userdata($session_data);
                     $this->session->set_flashdata('success', 'Welcome back, ' . $user->name . '!');
+                    
+                    // Redirect everyone to the unified dashboard
                     redirect('dashboard');
                 } else {
                     $this->session->set_flashdata('error', 'Invalid email or password.');
@@ -63,15 +72,45 @@ class Auth extends CI_Controller {
     
     public function logout() {
         $this->session->sess_destroy();
+        $this->session->set_flashdata('success', 'You have been logged out successfully.');
         redirect('login');
     }
     
     public function dashboard() {
+        // Authorization check - ensure user is logged in
         if (!$this->session->userdata('logged_in')) {
+            $this->session->set_flashdata('error', 'Please login to access the dashboard.');
             redirect('login');
         }
         
+        // Get user data from session
         $data['user'] = $this->session->userdata();
+        $role = $this->session->userdata('role');
+        
+        // Fetch role-specific data from database
+        switch($role) {
+            case 'admin':
+                // Fetch all users for admin
+                $data['total_users'] = $this->db->count_all('users');
+                $data['total_admins'] = $this->db->where('role', 'admin')->count_all_results('users');
+                $data['total_teachers'] = $this->db->where('role', 'teacher')->count_all_results('users');
+                $data['total_students'] = $this->db->where('role', 'student')->count_all_results('users');
+                $data['recent_users'] = $this->db->order_by('created_at', 'DESC')->limit(5)->get('users')->result();
+                break;
+                
+            case 'teacher':
+                // Fetch teacher-specific data
+                $data['total_students'] = $this->db->where('role', 'student')->count_all_results('users');
+                $data['recent_students'] = $this->db->where('role', 'student')->order_by('created_at', 'DESC')->limit(5)->get('users')->result();
+                break;
+                
+            case 'student':
+                // Fetch student-specific data
+                $data['total_teachers'] = $this->db->where('role', 'teacher')->count_all_results('users');
+                break;
+        }
+        
+        // Load the unified dashboard view
         $this->load->view('auth/dashboard', $data);
     }
 }
