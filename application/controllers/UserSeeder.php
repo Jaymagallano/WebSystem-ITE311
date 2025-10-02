@@ -18,10 +18,17 @@ class UserSeeder extends CI_Controller {
                 'created_at' => date('Y-m-d H:i:s')
             ),
             array(
-                'name' => 'Test User',
-                'email' => 'user@test.com',
-                'password' => password_hash('user123', PASSWORD_DEFAULT),
-                'role' => 'user',
+                'name' => 'Teacher User',
+                'email' => 'teacher@test.com',
+                'password' => password_hash('teacher123', PASSWORD_DEFAULT),
+                'role' => 'teacher',
+                'created_at' => date('Y-m-d H:i:s')
+            ),
+            array(
+                'name' => 'Student User',
+                'email' => 'student@test.com',
+                'password' => password_hash('student123', PASSWORD_DEFAULT),
+                'role' => 'student',
                 'created_at' => date('Y-m-d H:i:s')
             )
         );
