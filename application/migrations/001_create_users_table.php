@@ -26,8 +26,8 @@ class Migration_Create_users_table extends CI_Migration {
             ),
             'role' => array(
                 'type' => 'ENUM',
-                'constraint' => array('admin', 'user'),
-                'default' => 'user'
+                'constraint' => array('admin', 'teacher', 'student'),
+                'default' => 'student'
             ),
             'created_at' => array(
                 'type' => 'DATETIME',
