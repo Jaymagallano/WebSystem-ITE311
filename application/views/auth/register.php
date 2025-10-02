@@ -17,7 +17,7 @@
                             <div class="alert alert-danger"><?= $this->session->flashdata('error') ?></div>
                         <?php endif; ?>
                         
-                        <?= form_open('register') ?>
+                        <?= form_open('register', ['id' => 'registerForm']) ?>
                             <div class="mb-3">
                                 <label class="form-label">Name</label>
                                 <input type="text" class="form-control" name="name" value="<?= set_value('name') ?>">

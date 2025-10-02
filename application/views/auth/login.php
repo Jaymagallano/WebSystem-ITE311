@@ -21,7 +21,7 @@
                             <div class="alert alert-success"><?= $this->session->flashdata('success') ?></div>
                         <?php endif; ?>
                         
-                        <?= form_open('login') ?>
+                        <?= form_open('login', ['id' => 'loginForm']) ?>
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
                                 <input type="email" class="form-control" name="email" value="<?= set_value('email') ?>">
