@@ -1,9 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migration_Create_courses_table extends CI_Migration {
-    
-    public function up() {
+class Migration_Create_assignments_table extends CI_Migration {
+
+    public function up()
+    {
         $this->dbforge->add_field(array(
             'id' => array(
                 'type' => 'INT',
@@ -11,39 +12,40 @@ class Migration_Create_courses_table extends CI_Migration {
                 'unsigned' => TRUE,
                 'auto_increment' => TRUE
             ),
-            'title' => array(
-                'type' => 'VARCHAR',
-                'constraint' => 200
-            ),
-            'code' => array(
-                'type' => 'VARCHAR',
-                'constraint' => 50,
-                'unique' => TRUE
-            ),
-            'description' => array(
-                'type' => 'TEXT'
-            ),
-            'teacher_id' => array(
+            'course_id' => array(
                 'type' => 'INT',
                 'constraint' => 11,
-                'unsigned' => TRUE
+                'unsigned' => TRUE,
+            ),
+            'title' => array(
+                'type' => 'VARCHAR',
+                'constraint' => '255',
+            ),
+            'description' => array(
+                'type' => 'TEXT',
+            ),
+            'due_date' => array(
+                'type' => 'DATETIME',
+            ),
+            'max_points' => array(
+                'type' => 'INT',
+                'constraint' => 11,
+                'default' => 100,
             ),
             'created_at' => array(
                 'type' => 'DATETIME',
-                'null' => TRUE
             ),
             'updated_at' => array(
                 'type' => 'DATETIME',
-                'null' => TRUE
-            )
+                'null' => TRUE,
+            ),
         ));
-        
         $this->dbforge->add_key('id', TRUE);
-        $this->dbforge->add_key('teacher_id');
-        $this->dbforge->create_table('courses');
+        $this->dbforge->create_table('assignments');
     }
-    
-    public function down() {
-        $this->dbforge->drop_table('courses');
+
+    public function down()
+    {
+        $this->dbforge->drop_table('assignments');
     }
 }

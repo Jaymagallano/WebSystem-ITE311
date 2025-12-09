@@ -53,10 +53,51 @@ $route['default_controller'] = 'auth/login';
 $route['about'] = 'home/about';
 $route['contact'] = 'home/contact';
 
+// Authentication Routes
 $route['register'] = 'auth/register';
 $route['login'] = 'auth/login';
 $route['logout'] = 'auth/logout';
 $route['dashboard'] = 'auth/dashboard';
+
+// Teacher Routes
+$route['teacher/courses'] = 'teacher/courses';
+$route['teacher/create_course'] = 'teacher/create_course';
+$route['teacher/edit_course/(:num)'] = 'teacher/edit_course/$1';
+$route['teacher/students'] = 'teacher/students';
+$route['teacher/students/(:num)'] = 'teacher/students/$1';
+$route['teacher/assignments'] = 'teacher/assignments';
+$route['teacher/create_assignment'] = 'teacher/create_assignment';
+$route['teacher/assignment_submissions/(:num)'] = 'teacher/assignment_submissions/$1';
+$route['teacher/grades'] = 'teacher/grades';
+$route['teacher/grades/(:num)'] = 'teacher/grades/$1';
+$route['teacher/student_grades/(:num)/(:num)'] = 'teacher/student_grades/$1/$2';
+$route['teacher/grade_submission/(:num)'] = 'teacher/grade_submission/$1';
+$route['teacher/materials'] = 'teacher/materials';
+$route['teacher/materials/(:num)'] = 'teacher/materials/$1';
+$route['teacher/upload_material'] = 'teacher/upload_material';
+$route['teacher/delete_material/(:num)'] = 'teacher/delete_material/$1';
+
+// Student Routes
+$route['student/courses'] = 'student/courses';
+$route['student/enroll/(:num)'] = 'student/enroll/$1';
+$route['student/course_details/(:num)'] = 'student/course_details/$1';
+$route['student/assignments'] = 'student/assignments';
+$route['student/submit_assignment/(:num)'] = 'student/submit_assignment/$1';
+$route['student/grades'] = 'student/grades';
+$route['student/schedule'] = 'student/schedule';
+$route['student/resources'] = 'student/resources';
+$route['student/resources/(:num)'] = 'student/resources/$1';
+$route['student/download_material/(:num)'] = 'student/download_material/$1';
+
+// Admin Routes
+$route['admin/users'] = 'admin/users';
+$route['admin/create_user'] = 'admin/create_user';
+$route['admin/edit_user/(:num)'] = 'admin/edit_user/$1';
+$route['admin/delete_user/(:num)'] = 'admin/delete_user/$1';
+$route['admin/courses'] = 'admin/courses';
+$route['admin/delete_course/(:num)'] = 'admin/delete_course/$1';
+$route['admin/settings'] = 'admin/settings';
+$route['admin/reports'] = 'admin/reports';
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

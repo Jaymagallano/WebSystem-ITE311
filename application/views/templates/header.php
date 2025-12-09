@@ -67,52 +67,52 @@
                         <i class="bi bi-speedometer2"></i> Dashboard
                     </a>
                     
-                    <?php if($this->session->userdata('role') == 'admin'): ?>
+                                        <?php if($this->session->userdata('role') == 'admin'): ?>
                         <!-- Admin Menu Items -->
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'users' ? 'active' : '' ?>" href="<?= base_url('admin/users') ?>">
                             <i class="bi bi-people"></i> Manage Users
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'courses' ? 'active' : '' ?>" href="<?= base_url('admin/courses') ?>">
                             <i class="bi bi-book"></i> Manage Courses
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'settings' ? 'active' : '' ?>" href="<?= base_url('admin/settings') ?>">
                             <i class="bi bi-gear"></i> System Settings
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'reports' ? 'active' : '' ?>" href="<?= base_url('admin/reports') ?>">
                             <i class="bi bi-bar-chart"></i> Reports
                         </a>
-                    <?php elseif($this->session->userdata('role') == 'teacher'): ?>
+                                        <?php elseif($this->session->userdata('role') == 'teacher'): ?>
                         <!-- Teacher Menu Items -->
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'courses' ? 'active' : '' ?>" href="<?= base_url('teacher/courses') ?>">
                             <i class="bi bi-journal-text"></i> My Courses
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'students' ? 'active' : '' ?>" href="<?= base_url('teacher/students') ?>">
                             <i class="bi bi-people"></i> Students
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'assignments' ? 'active' : '' ?>" href="<?= base_url('teacher/assignments') ?>">
                             <i class="bi bi-clipboard-check"></i> Assignments
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'grades' ? 'active' : '' ?>" href="<?= base_url('teacher/grades') ?>">
                             <i class="bi bi-calculator"></i> Grades
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'materials' ? 'active' : '' ?>" href="<?= base_url('teacher/materials') ?>">
                             <i class="bi bi-file-earmark-text"></i> Materials
                         </a>
-                    <?php elseif($this->session->userdata('role') == 'student'): ?>
+                                        <?php elseif($this->session->userdata('role') == 'student'): ?>
                         <!-- Student Menu Items -->
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'courses' ? 'active' : '' ?>" href="<?= base_url('student/courses') ?>">
                             <i class="bi bi-book"></i> My Courses
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'assignments' ? 'active' : '' ?>" href="<?= base_url('student/assignments') ?>">
                             <i class="bi bi-clipboard-check"></i> Assignments
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'grades' ? 'active' : '' ?>" href="<?= base_url('student/grades') ?>">
                             <i class="bi bi-bar-chart"></i> Grades
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'schedule' ? 'active' : '' ?>" href="<?= base_url('student/schedule') ?>">
                             <i class="bi bi-calendar3"></i> Schedule
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link <?= $this->uri->segment(2) == 'resources' ? 'active' : '' ?>" href="<?= base_url('student/resources') ?>">
                             <i class="bi bi-download"></i> Resources
                         </a>
                     <?php endif; ?>
