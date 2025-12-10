@@ -142,72 +142,18 @@
                                         </td>
                                         <td>
                                             <?php if($submission->submitted_at): ?>
-                                                <button type="button" class="btn btn-sm btn-outline-primary" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#gradeModal<?= $submission->id ?>">
+                                                <button type="button" class="btn btn-sm btn-outline-primary grade-btn" 
+                                                        data-submission-id="<?= $submission->id ?>"
+                                                        data-assignment-title="<?= htmlspecialchars($submission->assignment_title) ?>"
+                                                        data-file-path="<?= $submission->file_path ?>"
+                                                        data-file-name="<?= htmlspecialchars($submission->file_name) ?>"
+                                                        data-score="<?= $submission->score ?>"
+                                                        data-max-points="<?= $submission->max_points ?>"
+                                                        data-feedback="<?= htmlspecialchars($submission->feedback ?? '') ?>"
+                                                        data-course-id="<?= $course->id ?>"
+                                                        data-student-id="<?= $student->id ?>">
                                                     <i class="bi bi-pencil"></i> <?= $submission->score !== null ? 'Edit' : 'Grade' ?>
                                                 </button>
-                                                
-                                                <!-- Grade Modal -->
-                                                <div class="modal fade" id="gradeModal<?= $submission->id ?>" tabindex="-1">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title">Grade Submission</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                            </div>
-                                                            <form method="post" action="<?= base_url('teacher/grade_submission/' . $submission->id) ?>">
-                                                                <input type="hidden" name="course_id" value="<?= $course->id ?>">
-                                                                <input type="hidden" name="student_id" value="<?= $student->id ?>">
-                                                                <input type="hidden" name="redirect_to" value="student_grades">
-                                                                <div class="modal-body">
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label"><strong>Assignment:</strong></label>
-                                                                        <p><?= $submission->assignment_title ?></p>
-                                                                    </div>
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label"><strong>Submitted File:</strong></label>
-                                                                        <p>
-                                                                            <a href="<?= base_url($submission->file_path) ?>" target="_blank">
-                                                                                <i class="bi bi-file-earmark"></i> <?= $submission->file_name ?>
-                                                                            </a>
-                                                                        </p>
-                                                                    </div>
-                                                                    <div class="mb-3">
-                                                                        <label for="score<?= $submission->id ?>" class="form-label">
-                                                                            Score <span class="text-danger">*</span>
-                                                                        </label>
-                                                                        <input type="number" 
-                                                                               class="form-control" 
-                                                                               id="score<?= $submission->id ?>" 
-                                                                               name="score" 
-                                                                               min="0" 
-                                                                               max="<?= $submission->max_points ?>" 
-                                                                               step="0.01"
-                                                                               value="<?= $submission->score ?>"
-                                                                               required>
-                                                                        <small class="text-muted">Maximum points: <?= $submission->max_points ?></small>
-                                                                    </div>
-                                                                    <div class="mb-3">
-                                                                        <label for="feedback<?= $submission->id ?>" class="form-label">
-                                                                            Feedback (Optional)
-                                                                        </label>
-                                                                        <textarea class="form-control" 
-                                                                                  id="feedback<?= $submission->id ?>" 
-                                                                                  name="feedback" 
-                                                                                  rows="3"><?= $submission->feedback ?></textarea>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                    <button type="submit" class="btn btn-primary">
-                                                                        <i class="bi bi-save"></i> Save Grade
-                                                                    </button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             <?php else: ?>
                                                 <span class="text-muted">-</span>
                                             <?php endif; ?>
@@ -227,6 +173,61 @@
     </div>
 </div>
 
+<!-- Grade Modal Template -->
+<div class="modal fade" id="gradeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Grade Submission</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="gradeForm" method="post">
+                <input type="hidden" name="course_id" id="courseIdInput">
+                <input type="hidden" name="student_id" id="studentIdInput">
+                <input type="hidden" name="redirect_to" value="student_grades">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Assignment:</strong></label>
+                        <p id="assignmentTitle"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Submitted File:</strong></label>
+                        <p id="submittedFile"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="scoreInput" class="form-label">
+                            Score <span class="text-danger">*</span>
+                        </label>
+                        <input type="number" 
+                               class="form-control" 
+                               id="scoreInput" 
+                               name="score" 
+                               min="0" 
+                               step="0.01"
+                               required>
+                        <small class="text-muted" id="maxPointsText"></small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="feedbackInput" class="form-label">
+                            Feedback (Optional)
+                        </label>
+                        <textarea class="form-control" 
+                                  id="feedbackInput" 
+                                  name="feedback" 
+                                  rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Save Grade
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="row mt-3">
     <div class="col-12">
         <a href="<?= base_url('teacher/grades/' . $course->id) ?>" class="btn btn-secondary">
@@ -234,5 +235,47 @@
         </a>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const gradeButtons = document.querySelectorAll('.grade-btn');
+    const gradeModal = new bootstrap.Modal(document.getElementById('gradeModal'));
+    const gradeForm = document.getElementById('gradeForm');
+    
+    gradeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const submissionId = this.dataset.submissionId;
+            const assignmentTitle = this.dataset.assignmentTitle;
+            const filePath = this.dataset.filePath;
+            const fileName = this.dataset.fileName;
+            const score = this.dataset.score;
+            const maxPoints = this.dataset.maxPoints;
+            const feedback = this.dataset.feedback;
+            const courseId = this.dataset.courseId;
+            const studentId = this.dataset.studentId;
+            
+            // Populate modal fields
+            document.getElementById('assignmentTitle').textContent = assignmentTitle;
+            document.getElementById('submittedFile').innerHTML = 
+                '<a href="<?= base_url() ?>' + filePath + '" target="_blank"><i class="bi bi-file-earmark"></i> ' + fileName + '</a>';
+            document.getElementById('scoreInput').value = score || '';
+            document.getElementById('scoreInput').max = maxPoints;
+            document.getElementById('maxPointsText').textContent = 'Maximum points: ' + maxPoints;
+            document.getElementById('feedbackInput').value = feedback || '';
+            document.getElementById('courseIdInput').value = courseId;
+            document.getElementById('studentIdInput').value = studentId;
+            
+            // Update form action
+            gradeForm.action = '<?= base_url('teacher/grade_submission/') ?>' + submissionId;
+            
+            // Show modal
+            gradeModal.show();
+        });
+    });
+});
+</script>
 
 <?php $this->load->view('templates/footer'); ?>
