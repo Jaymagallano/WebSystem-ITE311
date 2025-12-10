@@ -79,34 +79,11 @@
                                                 <a href="<?= base_url('uploads/materials/'.$material->file_name) ?>" class="btn btn-sm btn-outline-primary" download>
                                                     <i class="bi bi-download"></i> Download
                                                 </a>
-                                                <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#deleteModal<?= $material->id ?>">
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-material-btn" 
+                                                        data-material-id="<?= $material->id ?>"
+                                                        data-material-title="<?= htmlspecialchars($material->title) ?>">
                                                     <i class="bi bi-trash"></i> Delete
                                                 </button>
-                                                
-                                                <!-- Delete Confirmation Modal -->
-                                                <div class="modal fade" id="deleteModal<?= $material->id ?>" tabindex="-1">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title">Confirm Delete</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <p>Are you sure you want to delete this material?</p>
-                                                                <p><strong><?= $material->title ?></strong></p>
-                                                                <p class="text-muted">This action cannot be undone.</p>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                <a href="<?= base_url('teacher/delete_material/' . $material->id) ?>" class="btn btn-danger">
-                                                                    <i class="bi bi-trash"></i> Delete
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -139,5 +116,52 @@
         </div>
     </div>
 <?php endif; ?>
+
+<!-- Delete Confirmation Modal (Reusable) -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this material?</p>
+                <p><strong id="materialTitle"></strong></p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a id="deleteLink" href="#" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Delete
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteMaterialButtons = document.querySelectorAll('.delete-material-btn');
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    
+    deleteMaterialButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const materialId = this.dataset.materialId;
+            const materialTitle = this.dataset.materialTitle;
+            
+            // Update modal content
+            document.getElementById('materialTitle').textContent = materialTitle;
+            document.getElementById('deleteLink').href = '<?= base_url('teacher/delete_material/') ?>' + materialId;
+            
+            // Show modal
+            deleteModal.show();
+        });
+    });
+});
+</script>
 
 <?php $this->load->view('templates/footer'); ?>
