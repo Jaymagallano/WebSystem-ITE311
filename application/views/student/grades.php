@@ -66,27 +66,11 @@
                                         <td><?= date('M d, Y', strtotime($grade->submitted_at)) ?></td>
                                         <td>
                                             <?php if($grade->feedback): ?>
-                                                <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#feedbackModal<?= $grade->id ?>">
+                                                <button class="btn btn-sm btn-outline-info view-feedback-btn" 
+                                                        data-feedback="<?= htmlspecialchars($grade->feedback) ?>"
+                                                        data-assignment="<?= htmlspecialchars($grade->assignment_title) ?>">
                                                     <i class="bi bi-chat-text"></i> View
                                                 </button>
-                                                
-                                                <!-- Feedback Modal -->
-                                                <div class="modal fade" id="feedbackModal<?= $grade->id ?>" tabindex="-1">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title">Teacher Feedback</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <p><?= nl2br($grade->feedback) ?></p>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             <?php else: ?>
                                                 <span class="text-muted">-</span>
                                             <?php endif; ?>
@@ -108,5 +92,47 @@
         </div>
     </div>
 </div>
+
+<!-- Feedback Modal (Reusable) -->
+<div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Teacher Feedback - <span id="assignmentName"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="feedbackContent"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const feedbackButtons = document.querySelectorAll('.view-feedback-btn');
+    const feedbackModal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+    
+    feedbackButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const feedback = this.dataset.feedback;
+            const assignmentName = this.dataset.assignment;
+            
+            // Update modal content
+            document.getElementById('assignmentName').textContent = assignmentName;
+            document.getElementById('feedbackContent').innerHTML = feedback.replace(/\n/g, '<br>');
+            
+            // Show modal
+            feedbackModal.show();
+        });
+    });
+});
+</script>
 
 <?php $this->load->view('templates/footer'); ?>
