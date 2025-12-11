@@ -1,4 +1,45 @@
+# 🛡️ SMART SECURITY - PROTECT BUT ALLOW LEGITIMATE ACCESS 🛡️
 RewriteEngine On
+
+# Allow static files (CSS, JS, Images, Fonts)
+RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ [NC]
+RewriteRule .* - [S=25]
+
+# Allow legitimate CodeIgniter operations
+RewriteCond %{REQUEST_URI} ^/ITE311-MAGALLANO/(index\.php|uploads/) [NC]
+RewriteRule .* - [S=24]
+
+# Allow normal CodeIgniter routing
+RewriteCond %{REQUEST_URI} ^/ITE311-MAGALLANO/index\.php/[a-zA-Z0-9_/]+$ [NC]
+RewriteRule .* - [S=23]
+
+# Allow assets/public directories if they exist
+RewriteCond %{REQUEST_URI} ^/ITE311-MAGALLANO/(assets|public|css|js|images|img)/ [NC]
+RewriteRule .* - [S=22]
+
+# Block dangerous file access
+RewriteCond %{REQUEST_URI} ^/ITE311-MAGALLANO/(application|system)/ [NC]
+RewriteRule .* /cyber_fortress.php [L]
+
+# Block ALL attack patterns in query strings
+RewriteCond %{QUERY_STRING} (\.\.|\.%2e|%2e\.|%2e%2e|\.\.\.|\.\.%2f|%2e%2e%2f) [NC,OR]
+RewriteCond %{QUERY_STRING} (windows|system32|etc/passwd|boot\.ini|win\.ini) [NC,OR]
+RewriteCond %{QUERY_STRING} (php://|file://|http://|https://|ftp://) [NC,OR]
+RewriteCond %{QUERY_STRING} (union|select|drop|insert|delete|update|where|from) [NC,OR]
+RewriteCond %{QUERY_STRING} (script|javascript|onload|onerror|alert|eval|exec) [NC,OR]
+RewriteCond %{QUERY_STRING} (base64_|convert\.|filter) [NC,OR]
+RewriteCond %{QUERY_STRING} (%27|%22|'|"|;|--|#) [NC]
+RewriteRule .* /cyber_fortress.php [L]
+
+# Block encoded attacks
+RewriteCond %{QUERY_STRING} (%3C|%3E|%28|%29|%7C|%26|%3B) [NC]
+RewriteRule .* /cyber_fortress.php [L]
+
+# Block path traversal in URI
+RewriteCond %{REQUEST_URI} \.\. [NC]
+RewriteRule .* /cyber_fortress.php [L]
+
+# CodeIgniter URL rewriting for clean URLs
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php/$1 [QSA,L]
