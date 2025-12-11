@@ -1,0 +1,252 @@
+{
+  "info": {
+    "name": "Course Enrollment Security Tests",
+    "description": "Security testing collection for course enrollment system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authorization Bypass Tests",
+      "item": [
+        {
+          "name": "Access Enrollment Without Login",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/student/enroll/1",
+              "host": ["{{base_url}}"],
+              "path": ["student", "enroll", "1"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Should redirect to login or show unauthorized', function () {",
+                  "    const responseText = pm.response.text();",
+                  "    pm.expect(responseText.toLowerCase()).to.satisfy(text => ",
+                  "        text.includes('login') || text.includes('unauthorized') || text.includes('access denied')",
+                  "    );",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Enrollment Without Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "course_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/student/enroll/1",
+              "host": ["{{base_url}}"],
+              "path": ["student", "enroll", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SQL Injection Tests",
+      "item": [
+        {
+          "name": "SQL Injection - OR 1=1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/student/enroll/1 OR 1=1",
+              "host": ["{{base_url}}"],
+              "path": ["student", "enroll", "1 OR 1=1"]
+            }
+          }
+        },
+        {
+          "name": "SQL Injection - UNION SELECT",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/student/enroll/1 UNION SELECT * FROM users",
+              "host": ["{{base_url}}"],
+              "path": ["student", "enroll", "1 UNION SELECT * FROM users"]
+            }
+          }
+        },
+        {
+          "name": "SQL Injection - DROP TABLE",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/student/enroll/1; DROP TABLE enrollments; --",
+              "host": ["{{base_url}}"],
+              "path": ["student", "enroll", "1; DROP TABLE enrollments; --"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "CSRF Tests",
+      "item": [
+        {
+          "name": "Enrollment Without CSRF Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "course_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/student/enroll/1",
+              "host": ["{{base_url}}"],
+              "path": ["student", "enroll", "1"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Should reject request without CSRF token', function () {",
+                  "    const responseText = pm.response.text();",
+                  "    pm.expect(responseText.toLowerCase()).to.satisfy(text => ",
+                  "        text.includes('csrf') || text.includes('token') || text.includes('forbidden')",
+                  "    );",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Data Tampering Tests",
+      "item": [
+        {
+          "name": "Tamper User ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "course_id",
+                  "value": "1"
+                },
+                {
+                  "key": "user_id",
+                  "value": "999"
+                },
+                {
+                  "key": "student_id",
+                  "value": "999"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/student/enroll/1",
+              "host": ["{{base_url}}"],
+              "path": ["student", "enroll", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Input Validation Tests",
+      "item": [
+        {
+          "name": "Invalid Course ID - String",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/student/enroll/abc",
+              "host": ["{{base_url}}"],
+              "path": ["student", "enroll", "abc"]
+            }
+          }
+        },
+        {
+          "name": "Invalid Course ID - Negative",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/student/enroll/-1",
+              "host": ["{{base_url}}"],
+              "path": ["student", "enroll", "-1"]
+            }
+          }
+        },
+        {
+          "name": "Invalid Course ID - XSS",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/student/enroll/<script>alert(1)</script>",
+              "host": ["{{base_url}}"],
+              "path": ["student", "enroll", "<script>alert(1)</script>"]
+            }
+          }
+        },
+        {
+          "name": "Non-existent Course ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/student/enroll/999999",
+              "host": ["{{base_url}}"],
+              "path": ["student", "enroll", "999999"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost/ITE311-MAGALLANO"
+    }
+  ]
+}

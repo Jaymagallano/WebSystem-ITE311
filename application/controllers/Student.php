@@ -30,6 +30,17 @@ class Student extends CI_Controller {
     }
     
     public function enroll($course_id) {
+        // CSRF Protection disabled for normal usage
+        // Uncomment below lines to re-enable CSRF protection:
+        /*
+        $csrf_token = $this->input->post($this->config->item('csrf_token_name')) ?: $this->input->get($this->config->item('csrf_token_name'));
+        $csrf_cookie = $this->input->cookie($this->config->item('csrf_cookie_name'));
+        
+        if (!$csrf_token || !$csrf_cookie || !hash_equals($csrf_cookie, $csrf_token)) {
+            show_error('The action you have requested is not allowed (CSRF token mismatch).', 403);
+        }
+        */
+        
         $course = $this->Course_model->get_course_by_id($course_id);
         
         if (!$course) {
@@ -37,7 +48,7 @@ class Student extends CI_Controller {
             redirect('student/courses');
         }
         
-                $data = array(
+        $data = array(
             'student_id' => $this->session->userdata('user_id'),
             'course_id' => $course_id,
             'enrolled_at' => date('Y-m-d H:i:s')
