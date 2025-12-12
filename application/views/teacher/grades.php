@@ -47,9 +47,24 @@
                                             <td><i class="bi bi-person-circle"></i> <?= $student->name ?></td>
                                             <td><?= $student->email ?></td>
                                             <td>
-                                                <span class="badge bg-success">--%</span>
+                                                <?php if ($student->average_grade !== null): ?>
+                                                    <?php 
+                                                        $grade = $student->average_grade;
+                                                        $badge_class = 'bg-success';
+                                                        if ($grade < 60) {
+                                                            $badge_class = 'bg-danger';
+                                                        } elseif ($grade < 75) {
+                                                            $badge_class = 'bg-warning';
+                                                        } elseif ($grade < 85) {
+                                                            $badge_class = 'bg-info';
+                                                        }
+                                                    ?>
+                                                    <span class="badge <?= $badge_class ?>"><?= number_format($grade, 2) ?>%</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-secondary">No grades yet</span>
+                                                <?php endif; ?>
                                             </td>
-                                                                                        <td>
+                                            <td>
                                                 <a href="<?= base_url('teacher/student_grades/' . $selected_course->id . '/' . $student->id) ?>" class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-eye"></i> View Details
                                                 </a>

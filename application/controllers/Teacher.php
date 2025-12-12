@@ -175,6 +175,11 @@ class Teacher extends CI_Controller {
             $data['selected_course'] = $this->Course_model->get_course_by_id($course_id);
             $data['students'] = $this->Course_model->get_enrolled_students($course_id);
             $data['assignments'] = $this->Assignment_model->get_course_assignments($course_id);
+            
+            // Calculate average grade for each student
+            foreach ($data['students'] as $student) {
+                $student->average_grade = $this->Grade_model->get_student_average_grade($student->id, $course_id);
+            }
         }
         
         $this->load->view('teacher/grades', $data);
