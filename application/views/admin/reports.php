@@ -120,18 +120,18 @@
     </div>
 </div>
 
-<!-- User Growth Chart Placeholder -->
+<!-- User Growth Chart -->
 <div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header bg-white">
-                <h5 class="mb-0">User Growth</h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>User Growth (Last 6 Months)</h5>
+                    <span class="badge bg-primary">Live Data</span>
+                </div>
             </div>
             <div class="card-body">
-                <div class="text-center py-5">
-                    <i class="bi bi-graph-up" style="font-size: 4rem; color: #ccc;"></i>
-                    <p class="mt-3 text-muted">Chart visualization will be available soon</p>
-                </div>
+                <canvas id="userGrowthChart" style="max-height: 400px;"></canvas>
             </div>
         </div>
     </div>
@@ -142,23 +142,27 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header bg-white">
-                <h5 class="mb-0">Export Reports</h5>
+                <h5 class="mb-0"><i class="bi bi-download me-2"></i>Export Reports</h5>
             </div>
             <div class="card-body">
-                <div class="row">
+                <p class="text-muted mb-3">Download comprehensive system reports in various formats</p>
+                <div class="row g-3">
                     <div class="col-md-4">
-                        <button class="btn btn-outline-success w-100">
-                            <i class="bi bi-file-earmark-excel"></i> Export to Excel
-                        </button>
+                        <a href="<?= base_url('admin/export_excel') ?>" class="btn btn-success w-100 btn-lg">
+                            <i class="bi bi-file-earmark-excel me-2"></i>Export to CSV
+                            <small class="d-block mt-1" style="font-size: 0.75rem;">Download user data in CSV format</small>
+                        </a>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-outline-danger w-100">
-                            <i class="bi bi-file-earmark-pdf"></i> Export to PDF
-                        </button>
+                        <a href="<?= base_url('admin/export_pdf') ?>" class="btn btn-danger w-100 btn-lg">
+                            <i class="bi bi-file-earmark-pdf me-2"></i>Export to HTML
+                            <small class="d-block mt-1" style="font-size: 0.75rem;">Download full report in HTML</small>
+                        </a>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-outline-primary w-100">
-                            <i class="bi bi-printer"></i> Print Report
+                        <button onclick="window.print()" class="btn btn-primary w-100 btn-lg">
+                            <i class="bi bi-printer me-2"></i>Print Report
+                            <small class="d-block mt-1" style="font-size: 0.75rem;">Print current page</small>
                         </button>
                     </div>
                 </div>
@@ -166,5 +170,87 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+// User Growth Chart
+const ctx = document.getElementById('userGrowthChart').getContext('2d');
+const userGrowthChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: <?= json_encode(array_column($user_growth, 'month')) ?>,
+        datasets: [{
+            label: 'Total Users Registered',
+            data: <?= json_encode(array_column($user_growth, 'count')) ?>,
+            backgroundColor: 'rgba(44, 82, 130, 0.1)',
+            borderColor: 'rgba(44, 82, 130, 1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#2c5282',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                    font: {
+                        size: 14,
+                        weight: '500'
+                    },
+                    padding: 20
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(44, 82, 130, 0.9)',
+                padding: 12,
+                titleFont: {
+                    size: 14
+                },
+                bodyFont: {
+                    size: 13
+                },
+                callbacks: {
+                    label: function(context) {
+                        return ' ' + context.parsed.y + ' users registered';
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1,
+                    font: {
+                        size: 12
+                    }
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                }
+            },
+            x: {
+                ticks: {
+                    font: {
+                        size: 12
+                    }
+                },
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
+</script>
 
 <?php $this->load->view('templates/footer'); ?>

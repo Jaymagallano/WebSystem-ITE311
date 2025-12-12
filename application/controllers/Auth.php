@@ -99,14 +99,47 @@ class Auth extends CI_Controller {
                 break;
                 
             case 'teacher':
+                // Load models for teacher data
+                $this->load->model('Course_model');
+                $this->load->model('Assignment_model');
+                
                 // Fetch teacher-specific data
+                $teacher_id = $this->session->userdata('user_id');
                 $data['total_students'] = $this->db->where('role', 'student')->count_all_results('users');
                 $data['recent_students'] = $this->db->where('role', 'student')->order_by('created_at', 'DESC')->limit(5)->get('users')->result();
+                
+                // Get teacher's course count
+                $data['total_courses'] = $this->db->where('teacher_id', $teacher_id)->count_all_results('courses');
+                
+                // Get teacher's assignment count
+                $this->db->select('assignments.id');
+                $this->db->from('assignments');
+                $this->db->join('courses', 'assignments.course_id = courses.id');
+                $this->db->where('courses.teacher_id', $teacher_id);
+                $data['total_assignments'] = $this->db->count_all_results();
                 break;
                 
             case 'student':
+                // Load models for student data
+                $this->load->model('Course_model');
+                
                 // Fetch student-specific data
+                $student_id = $this->session->userdata('user_id');
                 $data['total_teachers'] = $this->db->where('role', 'teacher')->count_all_results('users');
+                
+                // Get student's enrolled course count
+                $data['total_enrolled_courses'] = $this->db->where('student_id', $student_id)->count_all_results('enrollments');
+                
+                // Get student's pending assignments count
+                $this->db->select('assignments.id');
+                $this->db->from('assignments');
+                $this->db->join('enrollments', 'assignments.course_id = enrollments.course_id');
+                $this->db->where('enrollments.student_id', $student_id);
+                $this->db->where('assignments.due_date >=', date('Y-m-d'));
+                // Check if not yet submitted
+                $this->db->join('assignment_submissions', "assignment_submissions.assignment_id = assignments.id AND assignment_submissions.student_id = $student_id", 'left');
+                $this->db->where('assignment_submissions.id IS NULL');
+                $data['total_pending_assignments'] = $this->db->count_all_results();
                 break;
         }
         
