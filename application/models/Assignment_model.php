@@ -29,7 +29,7 @@ class Assignment_model extends CI_Model {
     }
     
     public function get_assignment_by_id($assignment_id) {
-        $this->db->select('assignments.*, courses.title as course_title');
+        $this->db->select('assignments.*, courses.title as course_title, courses.code as course_code');
         $this->db->from('assignments');
         $this->db->join('courses', 'assignments.course_id = courses.id');
         $this->db->where('assignments.id', $assignment_id);
@@ -38,6 +38,10 @@ class Assignment_model extends CI_Model {
     
     public function create_assignment($data) {
         return $this->db->insert('assignments', $data);
+    }
+    
+    public function update_assignment($assignment_id, $data) {
+        return $this->db->where('id', $assignment_id)->update('assignments', $data);
     }
     
         public function submit_assignment($data) {
@@ -56,11 +60,20 @@ class Assignment_model extends CI_Model {
     }
     
         public function get_assignment_submissions($assignment_id) {
-        $this->db->select('assignment_submissions.*, users.name as student_name, users.email as student_email');
+        $this->db->select('assignment_submissions.*, users.name as student_name, users.email as student_email, assignments.course_id');
         $this->db->from('assignment_submissions');
         $this->db->join('users', 'assignment_submissions.student_id = users.id');
+        $this->db->join('assignments', 'assignment_submissions.assignment_id = assignments.id');
         $this->db->where('assignment_submissions.assignment_id', $assignment_id);
         $this->db->order_by('assignment_submissions.submitted_at', 'DESC');
-        return $this->db->get()->result();
+        $submissions = $this->db->get()->result();
+        
+        // Add computed status field based on graded_at
+        foreach ($submissions as $submission) {
+            $submission->status = ($submission->graded_at !== null) ? 'graded' : 'pending';
+            $submission->points_earned = $submission->score; // Alias for consistency
+        }
+        
+        return $submissions;
     }
 }

@@ -31,8 +31,8 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="courseFilter" class="form-label">Select Course:</label>
-            <select class="form-select" id="courseFilter" onchange="window.location.href='<?= base_url('teacher/materials/') ?>' + this.value">
-                <option value="">Choose a course...</option>
+            <select class="form-select" id="courseFilter">
+                <option value="" selected>Choose a course...</option>
                 <?php foreach($courses as $course): ?>
                     <option value="<?= $course->id ?>" <?= isset($selected_course) && $selected_course->id == $course->id ? 'selected' : '' ?>>
                         <?= $course->code ?> - <?= $course->title ?>
@@ -132,9 +132,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a id="deleteLink" href="#" class="btn btn-danger">
-                    <i class="bi bi-trash"></i> Delete
-                </a>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -142,8 +144,23 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Course filter change handler
+    const courseFilter = document.getElementById('courseFilter');
+    if (courseFilter) {
+        courseFilter.addEventListener('change', function() {
+            const courseId = this.value;
+            if (courseId) {
+                window.location.href = '<?= base_url('teacher/materials/') ?>' + courseId;
+            } else {
+                window.location.href = '<?= base_url('teacher/materials') ?>';
+            }
+        });
+    }
+    
+    // Delete modal code
     const deleteMaterialButtons = document.querySelectorAll('.delete-material-btn');
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const deleteForm = document.getElementById('deleteForm');
     
     deleteMaterialButtons.forEach(button => {
         button.addEventListener('click', function(e) {
@@ -153,13 +170,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const materialId = this.dataset.materialId;
             const materialTitle = this.dataset.materialTitle;
             
+            console.log('Delete button clicked for material ID:', materialId);
+            
             // Update modal content
             document.getElementById('materialTitle').textContent = materialTitle;
-            document.getElementById('deleteLink').href = '<?= base_url('teacher/delete_material/') ?>' + materialId;
+            
+            // Update form action
+            deleteForm.action = '<?= base_url('teacher/delete_material/') ?>' + materialId;
+            
+            console.log('Form action set to:', deleteForm.action);
             
             // Show modal
             deleteModal.show();
         });
+    });
+    
+    // Add form submit handler for debugging
+    deleteForm.addEventListener('submit', function(e) {
+        console.log('Form submitting to:', this.action);
     });
 });
 </script>

@@ -154,7 +154,7 @@
                         </a>
                     </div>
                     <div class="col-md-4">
-                        <a href="<?= base_url('admin/export_pdf') ?>" class="btn btn-danger w-100 btn-lg">
+                        <a href="<?= base_url('admin/export_html') ?>" class="btn btn-danger w-100 btn-lg">
                             <i class="bi bi-file-earmark-pdf me-2"></i>Export to HTML
                             <small class="d-block mt-1" style="font-size: 0.75rem;">Download full report in HTML</small>
                         </a>

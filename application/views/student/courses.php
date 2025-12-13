@@ -171,7 +171,7 @@
                         </div>
                     </div>
                     <div class="card-footer bg-transparent border-0 p-4 pt-0">
-                        <a href="<?= base_url('student/enroll/'.$course->id) ?>" class="btn btn-primary w-100 btn-lg enroll-btn" onclick="return confirm('🎓 Ready to start learning? Enroll in this course now!')">
+                        <a href="<?= base_url('student/enroll/'.$course->id) ?>" class="btn btn-primary w-100 btn-lg enroll-btn" data-action="enroll">
                             <i class="bi bi-plus-circle-fill me-2"></i>Enroll Now
                         </a>
                     </div>

@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="<?= base_url('assets/css/admin-theme.css') ?>" rel="stylesheet">
+    <script>
+        window.base_url = '<?= base_url() ?>';
+    </script>
     <style>
         :root {
             --primary-color: #2c5282;
@@ -243,6 +246,195 @@
         .sidebar::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.5);
         }
+        
+        /* Notification styles */
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: #2c5282;
+            transition: all 0.3s ease;
+            z-index: 10000; /* Ensure it's clickable */
+        }
+        
+        .notification-bell:hover {
+            color: #3182ce;
+            transform: scale(1.1);
+        }
+        
+        /* Add visual feedback when hovering */
+        .notification-bell:active {
+            transform: scale(0.95);
+            color: #3182ce;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 380px;
+            max-height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin-top: 10px;
+            display: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        
+        .notification-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .notification-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #2c5282 0%, #2a4365 100%);
+            color: white;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        .notification-item:hover {
+            background: #f7fafc;
+        }
+        
+        .notification-item.unread {
+            background: #ebf8ff;
+            border-left: 3px solid #3182ce;
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-right: 12px;
+        }
+        
+        .notification-icon.material {
+            background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+            color: white;
+        }
+        
+        .notification-icon.assignment {
+            background: linear-gradient(135deg, #dd6b20 0%, #c05621 100%);
+            color: white;
+        }
+        
+        .notification-icon.grade {
+            background: linear-gradient(135deg, #2f855a 0%, #276749 100%);
+            color: white;
+        }
+        
+        .notification-icon.enrollment {
+            background: linear-gradient(135deg, #2c7a7b 0%, #285e61 100%);
+            color: white;
+        }
+        
+        .notification-icon.submission {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+            color: white;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+        
+        .notification-message {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+        
+        .notification-time {
+            font-size: 0.75rem;
+            color: #a0aec0;
+        }
+        
+        .notification-footer {
+            padding: 12px 20px;
+            background: #f7fafc;
+            text-align: center;
+        }
+        
+        .notification-footer a {
+            color: #3182ce;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .notification-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .empty-notifications {
+            padding: 40px 20px;
+            text-align: center;
+            color: #a0aec0;
+        }
+        
+        .empty-notifications i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
 
     </style>
 </head>
@@ -335,6 +527,35 @@
                             <?= isset($page_title) ? $page_title : 'Dashboard' ?>
                         </span>
                         <div class="d-flex align-items-center">
+                            <!-- Notification Bell -->
+                            <div class="position-relative me-4" id="notification-container">
+                                <span class="notification-bell" id="notification-bell">
+                                    <i class="bi bi-bell-fill"></i>
+                                    <span class="notification-badge" id="notification-count" style="display: none;">0</span>
+                                </span>
+                                
+                                <!-- Notification Dropdown -->
+                                <div class="notification-dropdown" id="notification-dropdown">
+                                    <div class="notification-header">
+                                        <span>Notifications</span>
+                                        <a href="javascript:void(0)" id="mark-all-read" class="text-white text-decoration-none" style="font-size: 0.85rem;">
+                                            <i class="bi bi-check2-all"></i> Mark all read
+                                        </a>
+                                    </div>
+                                    <div class="notification-list" id="notification-list">
+                                        <!-- Notifications will be loaded here via AJAX -->
+                                        <div class="empty-notifications">
+                                            <i class="bi bi-bell-slash"></i>
+                                            <p>No notifications yet</p>
+                                        </div>
+                                    </div>
+                                    <div class="notification-footer">
+                                        <a href="#" id="view-all-notifications">View All Notifications</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- User Info -->
                             <span class="me-3">
                                 <i class="bi bi-person-circle"></i> 
                                 <?= $this->session->userdata('name') ?>

@@ -95,15 +95,15 @@
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <a href="#" class="btn btn-sm btn-outline-primary" title="Edit Assignment">
+                                                <a href="<?= base_url('teacher/edit_assignment/' . $assignment->id) ?>" class="btn btn-sm btn-outline-primary" title="Edit Assignment">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
                                                 <a href="<?= base_url('teacher/assignment_submissions/' . $assignment->id) ?>" class="btn btn-sm btn-outline-success" title="View Submissions">
                                                     <i class="bi bi-eye-fill"></i>
                                                 </a>
-                                                <button class="btn btn-sm btn-outline-info" title="Assignment Stats">
+                                                <a href="<?= base_url('teacher/assignment_stats/' . $assignment->id) ?>" class="btn btn-sm btn-outline-info" title="Assignment Stats">
                                                     <i class="bi bi-graph-up"></i>
-                                                </button>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>

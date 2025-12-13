@@ -15,7 +15,7 @@ class Grade_model extends CI_Model {
     }
     
         public function get_course_grades($course_id, $student_id) {
-        $this->db->select('assignment_submissions.*, assignments.title as assignment_title, assignments.max_points');
+        $this->db->select('assignment_submissions.*, assignments.title as assignment_title, assignments.max_points, assignments.due_date');
         $this->db->from('assignment_submissions');
         $this->db->join('assignments', 'assignment_submissions.assignment_id = assignments.id');
         $this->db->where('assignments.course_id', $course_id);
@@ -31,7 +31,16 @@ class Grade_model extends CI_Model {
             'graded_at' => date('Y-m-d H:i:s')
         );
         
-        return $this->db->where('id', $submission_id)->update('assignment_submissions', $data);
+        log_message('debug', 'Grade_model::update_grade - Submission ID: ' . $submission_id);
+        log_message('debug', 'Grade_model::update_grade - Data: ' . json_encode($data));
+        
+        $result = $this->db->where('id', $submission_id)->update('assignment_submissions', $data);
+        
+        log_message('debug', 'Grade_model::update_grade - Result: ' . ($result ? 'TRUE' : 'FALSE'));
+        log_message('debug', 'Grade_model::update_grade - Affected rows: ' . $this->db->affected_rows());
+        log_message('debug', 'Grade_model::update_grade - Last query: ' . $this->db->last_query());
+        
+        return $result;
     }
     
     public function get_student_average_grade($student_id, $course_id) {

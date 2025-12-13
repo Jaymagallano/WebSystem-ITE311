@@ -17,6 +17,7 @@ class Admin extends CI_Controller {
         }
         
         $this->load->model('Course_model');
+        $this->load->helper('download');
     }
     
     public function users() {
@@ -67,6 +68,13 @@ class Admin extends CI_Controller {
             $this->form_validation->set_rules('role', 'Role', 'required|in_list[admin,teacher,student]');
             
             if ($this->form_validation->run()) {
+                // Prevent admin from changing their own role
+                if ($user_id == $this->session->userdata('user_id') && 
+                    $this->input->post('role') !== $this->session->userdata('role')) {
+                    $this->session->set_flashdata('error', 'You cannot change your own role.');
+                    redirect('admin/edit_user/' . $user_id);
+                }
+                
                 $data = array(
                     'name' => $this->input->post('name'),
                     'role' => $this->input->post('role'),
@@ -201,50 +209,24 @@ class Admin extends CI_Controller {
         force_download($filename, $csv_content);
     }
     
-    public function export_pdf() {
-        // Simple HTML to PDF approach
-        $this->load->helper('download');
-        
-        // Get statistics
-        $total_users = $this->db->count_all('users');
-        $total_admins = $this->db->where('role', 'admin')->count_all_results('users');
-        $total_teachers = $this->db->where('role', 'teacher')->count_all_results('users');
-        $total_students = $this->db->where('role', 'student')->count_all_results('users');
-        $total_courses = $this->db->count_all('courses');
-        
-        // Get users
+    public function export_html() {
+        // Load all users data
         $users = $this->db->order_by('created_at', 'DESC')->get('users')->result();
         
-        // Create HTML content
+        // Generate HTML report
         $html = "<!DOCTYPE html>
 <html>
 <head>
-    <title>LMS Report</title>
+    <title>LMS Users Report</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h1 { color: #2c5282; }
-        .stats { display: flex; gap: 20px; margin: 20px 0; }
-        .stat-box { border: 2px solid #2c5282; padding: 15px; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #2c5282; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
-    <h1>LMS System Report</h1>
-    <p>Generated: " . date('M d, Y H:i:s') . "</p>
-    
-    <h2>Statistics Summary</h2>
-    <div class='stats'>
-        <div class='stat-box'>Total Users: <strong>$total_users</strong></div>
-        <div class='stat-box'>Admins: <strong>$total_admins</strong></div>
-        <div class='stat-box'>Teachers: <strong>$total_teachers</strong></div>
-        <div class='stat-box'>Students: <strong>$total_students</strong></div>
-        <div class='stat-box'>Courses: <strong>$total_courses</strong></div>
-    </div>
-    
-    <h2>User List</h2>
+    <h2>LMS Users Report</h2>
+    <p>Generated on: " . date('F j, Y') . "</p>
     <table>
         <thead>
             <tr>
@@ -274,5 +256,10 @@ class Admin extends CI_Controller {
         
         $filename = 'lms_report_' . date('Y-m-d') . '.html';
         force_download($filename, $html);
+    }
+    
+    public function notifications() {
+        $data['user'] = $this->session->userdata();
+        $this->load->view('admin/notifications', $data);
     }
 }

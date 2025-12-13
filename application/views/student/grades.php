@@ -9,12 +9,27 @@
 <?php if(isset($courses) && count($courses) > 0): ?>
     <div class="row mb-4">
         <?php foreach($courses as $course): ?>
+            <?php 
+            $average = isset($course_averages[$course->id]) ? $course_averages[$course->id] : null;
+            $grade_class = 'secondary';
+            if ($average !== null) {
+                if ($average >= 75) {
+                    $grade_class = 'success';
+                } elseif ($average >= 60) {
+                    $grade_class = 'warning';
+                } else {
+                    $grade_class = 'danger';
+                }
+            }
+            ?>
             <div class="col-md-4 mb-3">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title"><?= $course->title ?></h5>
                         <p class="text-muted"><small><?= $course->code ?></small></p>
-                        <h3 class="text-success">--%</h3>
+                        <h3 class="text-<?= $grade_class ?>">
+                            <?= $average !== null ? number_format($average, 1) . '%' : '--' ?>
+                        </h3>
                         <p class="text-muted mb-0">Average Grade</p>
                     </div>
                 </div>

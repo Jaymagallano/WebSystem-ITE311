@@ -120,7 +120,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Enhanced delete confirmations
-    const deleteButtons = document.querySelectorAll('[onclick*="confirm"]');
+    // Only target buttons that are actually for deletion
+    const deleteButtons = document.querySelectorAll('[data-action="delete"]');
+    // Alternative: target buttons with "delete" in onclick but not "enroll"
+    // const deleteButtons = document.querySelectorAll('[onclick*="delete"]:not([onclick*="enroll"])');
     deleteButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -135,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <h5 class="modal-title">
                                 <i class="bi bi-exclamation-triangle me-2"></i>Confirm Delete
                             </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
                             <p>Are you sure you want to delete this item? This action cannot be undone.</p>
@@ -154,6 +158,51 @@ document.addEventListener('DOMContentLoaded', function() {
             bsModal.show();
             
             modal.querySelector('#confirmDelete').addEventListener('click', () => {
+                window.location.href = this.href;
+            });
+            
+            modal.addEventListener('hidden.bs.modal', () => {
+                modal.remove();
+            });
+        });
+    });
+    
+    // Enrollment confirmations
+    const enrollButtons = document.querySelectorAll('[data-action="enroll"]');
+    enrollButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Create custom enrollment confirmation modal
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-mortarboard me-2"></i>Confirm Enrollment
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>🎓 Ready to start learning? Enroll in this course now!</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-success" id="confirmEnroll">
+                                <i class="bi bi-check-circle me-2"></i>Enroll Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+            
+            modal.querySelector('#confirmEnroll').addEventListener('click', () => {
                 window.location.href = this.href;
             });
             

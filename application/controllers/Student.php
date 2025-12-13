@@ -20,6 +20,7 @@ class Student extends CI_Controller {
         $this->load->model('Assignment_model');
         $this->load->model('Grade_model');
         $this->load->model('Material_model');
+        $this->load->model('Notification_model');
     }
     
     public function courses() {
@@ -55,6 +56,13 @@ class Student extends CI_Controller {
         );
         
         if ($this->Course_model->enroll_student($data)) {
+            // Send enrollment notification
+            $this->Notification_model->notify_enrollment(
+                $this->session->userdata('user_id'),
+                $course->title,
+                $course_id
+            );
+            
             $this->session->set_flashdata('success', 'Successfully enrolled in course!');
         } else {
             $this->session->set_flashdata('error', 'Failed to enroll in course.');
@@ -115,6 +123,24 @@ class Student extends CI_Controller {
                 );
                 
                 if ($this->Assignment_model->submit_assignment($data)) {
+                    // Get course and teacher info for notification
+                    $this->db->select('courses.teacher_id, users.name as student_name, assignments.title');
+                    $this->db->from('assignments');
+                    $this->db->join('courses', 'assignments.course_id = courses.id');
+                    $this->db->join('users', 'users.id = ' . $this->session->userdata('user_id'));
+                    $this->db->where('assignments.id', $assignment_id);
+                    $assignment_info = $this->db->get()->row();
+                    
+                    // Notify teacher about submission
+                    if ($assignment_info) {
+                        $this->Notification_model->notify_assignment_submission(
+                            $assignment_info->teacher_id,
+                            $assignment_info->student_name,
+                            $assignment_info->title,
+                            $assignment_id
+                        );
+                    }
+                    
                     $this->session->set_flashdata('success', 'Assignment submitted successfully!');
                     redirect('student/assignments');
                 }
@@ -129,9 +155,19 @@ class Student extends CI_Controller {
     }
     
     public function grades() {
+        $student_id = $this->session->userdata('user_id');
         $data['user'] = $this->session->userdata();
-        $data['courses'] = $this->Course_model->get_student_courses($this->session->userdata('user_id'));
-        $data['grades'] = $this->Grade_model->get_student_grades($this->session->userdata('user_id'));
+        $data['courses'] = $this->Course_model->get_student_courses($student_id);
+        $data['grades'] = $this->Grade_model->get_student_grades($student_id);
+        
+        // Calculate average grade per course
+        $course_averages = [];
+        foreach ($data['courses'] as $course) {
+            $avg = $this->Grade_model->get_student_average_grade($student_id, $course->id);
+            $course_averages[$course->id] = $avg;
+        }
+        $data['course_averages'] = $course_averages;
+        
         $this->load->view('student/grades', $data);
     }
     
@@ -168,5 +204,10 @@ class Student extends CI_Controller {
         
         $this->load->helper('download');
         force_download($material->file_path, NULL);
+    }
+    
+    public function notifications() {
+        $data['user'] = $this->session->userdata();
+        $this->load->view('student/notifications', $data);
     }
 }

@@ -68,6 +68,7 @@ $route['teacher/students/(:num)'] = 'teacher/students/$1';
 $route['teacher/assignments'] = 'teacher/assignments';
 $route['teacher/create_assignment'] = 'teacher/create_assignment';
 $route['teacher/assignment_submissions/(:num)'] = 'teacher/assignment_submissions/$1';
+$route['teacher/assignment_stats/(:num)'] = 'teacher/assignment_stats/$1';
 $route['teacher/grades'] = 'teacher/grades';
 $route['teacher/grades/(:num)'] = 'teacher/grades/$1';
 $route['teacher/student_grades/(:num)/(:num)'] = 'teacher/student_grades/$1/$2';
@@ -76,6 +77,7 @@ $route['teacher/materials'] = 'teacher/materials';
 $route['teacher/materials/(:num)'] = 'teacher/materials/$1';
 $route['teacher/upload_material'] = 'teacher/upload_material';
 $route['teacher/delete_material/(:num)'] = 'teacher/delete_material/$1';
+$route['teacher/notifications'] = 'teacher/notifications';
 
 // Student Routes
 $route['student/courses'] = 'student/courses';
@@ -88,6 +90,7 @@ $route['student/schedule'] = 'student/schedule';
 $route['student/resources'] = 'student/resources';
 $route['student/resources/(:num)'] = 'student/resources/$1';
 $route['student/download_material/(:num)'] = 'student/download_material/$1';
+$route['student/notifications'] = 'student/notifications';
 
 // Admin Routes
 $route['admin/users'] = 'admin/users';
@@ -98,7 +101,18 @@ $route['admin/courses'] = 'admin/courses';
 $route['admin/delete_course/(:num)'] = 'admin/delete_course/$1';
 $route['admin/settings'] = 'admin/settings';
 $route['admin/reports'] = 'admin/reports';
+$route['admin/notifications'] = 'admin/notifications';
+
+// Notification Routes (AJAX)
+$route['notifications/get_unread'] = 'notifications/get_unread';
+$route['notifications/get_all'] = 'notifications/get_all';
+$route['notifications/mark_read/(:num)'] = 'notifications/mark_read/$1';
+$route['notifications/mark_all_read'] = 'notifications/mark_all_read';
+
+// Test Notification Routes
+$route['test_notifications'] = 'test_notifications/index';
+$route['test_notifications/check'] = 'test_notifications/check';
+$route['test_notification_page'] = 'test_notification_page';
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
-
