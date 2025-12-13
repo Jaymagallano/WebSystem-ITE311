@@ -10,10 +10,10 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="courseFilter" class="form-label">Select Course:</label>
-            <select class="form-select" id="courseFilter" onchange="window.location.href='<?= base_url('teacher/grades/') ?>' + this.value">
+            <select class="form-select" id="courseFilter">
                 <option value="">Choose a course...</option>
                 <?php foreach($courses as $course): ?>
-                    <option value="<?= $course->id ?>" <?= isset($selected_course) && $selected_course->id == $course->id ? 'selected' : '' ?>>
+                    <option value="<?= $course->id ?>" <?= ($course_filter ?? '') == $course->id ? 'selected' : '' ?>>
                         <?= $course->code ?> - <?= $course->title ?>
                     </option>
                 <?php endforeach; ?>
@@ -23,11 +23,11 @@
 <?php endif; ?>
 
 <?php if(isset($selected_course)): ?>
-    <div class="row">
+    <div class="row" id="gradesTableContainer">
         <div class="col-12">
             <div class="card">
                 <div class="card-header bg-white">
-                    <h5 class="mb-0"><?= $selected_course->title ?> - Student Grades</h5>
+                    <h5 class="mb-0" id="courseTitle"><?= $selected_course->title ?> - Student Grades</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -40,7 +40,7 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="gradesTableBody">
                                 <?php if(isset($students) && count($students) > 0): ?>
                                     <?php foreach($students as $student): ?>
                                         <tr>
@@ -84,7 +84,7 @@
         </div>
     </div>
 <?php else: ?>
-    <div class="row">
+    <div class="row" id="gradesTableContainer">
         <div class="col-12">
             <div class="card">
                 <div class="card-body text-center py-5">
@@ -96,5 +96,120 @@
         </div>
     </div>
 <?php endif; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const courseFilter = document.getElementById('courseFilter');
+    const gradesTableContainer = document.getElementById('gradesTableContainer');
+    
+    if (courseFilter) {
+        courseFilter.addEventListener('change', function() {
+            const courseId = this.value;
+            
+            if (!courseId) {
+                // Show empty state
+                gradesTableContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <i class="bi bi-calculator" style="font-size: 4rem; color: #ccc;"></i>
+                                <h4 class="mt-3">Select a Course</h4>
+                                <p class="text-muted">Choose a course from the dropdown above to view and manage student grades.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                // Update URL
+                window.history.pushState({}, '', '<?= base_url('teacher/grades') ?>');
+                return;
+            }
+            
+            // Show loading state
+            gradesTableContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Loading grades...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Perform AJAX request
+            const formData = new FormData();
+            formData.append('course_id', courseId);
+            
+            fetch('<?= base_url('teacher/grades_ajax') ?>', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update table
+                    gradesTableContainer.innerHTML = `
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0">${data.course_title} - Student Grades</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Student Name</th>
+                                                    <th>Email</th>
+                                                    <th>Average Grade</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${data.html}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Update URL without reload
+                    window.history.pushState({}, '', '<?= base_url('teacher/grades?course_id=') ?>' + courseId);
+                    
+                    // Add fade-in animation
+                    gradesTableContainer.style.opacity = '0';
+                    setTimeout(() => {
+                        gradesTableContainer.style.transition = 'opacity 0.3s';
+                        gradesTableContainer.style.opacity = '1';
+                    }, 10);
+                } else {
+                    alert('Error loading grades: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                gradesTableContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                                <h4 class="mt-3 text-danger">Error Loading Grades</h4>
+                                <p class="text-muted">An error occurred while loading the grades. Please try again.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+    }
+});
+</script>
 
 <?php $this->load->view('templates/footer'); ?>

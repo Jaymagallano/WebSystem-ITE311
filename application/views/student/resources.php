@@ -10,10 +10,10 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="courseFilter" class="form-label">Filter by Course:</label>
-            <select class="form-select" id="courseFilter" onchange="window.location.href='<?= base_url('student/resources/') ?>' + this.value">
-                <option value="">All Courses</option>
+            <select class="form-select" id="courseFilter">
+                <option value="">Choose a course...</option>
                 <?php foreach($courses as $course): ?>
-                    <option value="<?= $course->id ?>" <?= isset($selected_course) && $selected_course->id == $course->id ? 'selected' : '' ?>>
+                    <option value="<?= $course->id ?>" <?= ($course_filter ?? '') == $course->id ? 'selected' : '' ?>>
                         <?= $course->code ?> - <?= $course->title ?>
                     </option>
                 <?php endforeach; ?>
@@ -23,11 +23,11 @@
 <?php endif; ?>
 
 <?php if(isset($selected_course)): ?>
-    <div class="row">
+    <div class="row" id="resourcesContainer">
         <div class="col-12">
             <div class="card">
                 <div class="card-header bg-white">
-                    <h5 class="mb-0"><?= $selected_course->title ?> - Materials</h5>
+                    <h5 class="mb-0" id="courseTitle"><?= $selected_course->title ?> - Materials</h5>
                 </div>
                 <div class="card-body">
                     <?php if(isset($materials) && count($materials) > 0): ?>
@@ -75,7 +75,7 @@
         </div>
     </div>
 <?php else: ?>
-    <div class="row">
+    <div class="row" id="resourcesContainer">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
@@ -100,5 +100,120 @@
         </div>
     </div>
 <?php endif; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const courseFilter = document.getElementById('courseFilter');
+    const resourcesContainer = document.getElementById('resourcesContainer');
+    
+    if (courseFilter) {
+        courseFilter.addEventListener('change', function() {
+            const courseId = this.value;
+            
+            if (!courseId) {
+                // Show empty state
+                resourcesContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="text-center py-5">
+                                    <i class="bi bi-download" style="font-size: 4rem; color: #ccc;"></i>
+                                    <h4 class="mt-3">Select a Course</h4>
+                                    <p class="text-muted">Choose a course from the dropdown above to view available resources.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                // Update URL
+                window.history.pushState({}, '', '<?= base_url('student/resources') ?>');
+                return;
+            }
+            
+            // Show loading state
+            resourcesContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Loading resources...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Perform AJAX request
+            const formData = new FormData();
+            formData.append('course_id', courseId);
+            
+            fetch('<?= base_url('student/resources_ajax') ?>', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update resources display
+                    resourcesContainer.innerHTML = `
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0">${data.course_title} - Materials</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        ${data.html}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Update URL without reload
+                    window.history.pushState({}, '', '<?= base_url('student/resources?course_id=') ?>' + courseId);
+                    
+                    // Add fade-in animation
+                    resourcesContainer.style.opacity = '0';
+                    setTimeout(() => {
+                        resourcesContainer.style.transition = 'opacity 0.3s';
+                        resourcesContainer.style.opacity = '1';
+                    }, 10);
+                } else {
+                    resourcesContainer.innerHTML = `
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body text-center py-5">
+                                    <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                                    <h4 class="mt-3 text-danger">Error</h4>
+                                    <p class="text-muted">${data.message}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resourcesContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                                <h4 class="mt-3 text-danger">Error Loading Resources</h4>
+                                <p class="text-muted">An error occurred while loading the resources. Please try again.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+    }
+});
+</script>
 
 <?php $this->load->view('templates/footer'); ?>

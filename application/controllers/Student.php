@@ -181,17 +181,95 @@ class Student extends CI_Controller {
         $data['user'] = $this->session->userdata();
         $data['courses'] = $this->Course_model->get_student_courses($this->session->userdata('user_id'));
         
-        if ($course_id) {
-            if (!$this->Course_model->is_enrolled($this->session->userdata('user_id'), $course_id)) {
+        // Get course from query parameter or URL segment
+        $course_filter = $this->input->get('course_id') ?: $course_id;
+        
+        if ($course_filter) {
+            if (!$this->Course_model->is_enrolled($this->session->userdata('user_id'), $course_filter)) {
                 $this->session->set_flashdata('error', 'Access denied.');
                 redirect('student/resources');
             }
             
-            $data['selected_course'] = $this->Course_model->get_course_by_id($course_id);
-            $data['materials'] = $this->Material_model->get_course_materials($course_id);
+            $data['selected_course'] = $this->Course_model->get_course_by_id($course_filter);
+            $data['materials'] = $this->Material_model->get_course_materials($course_filter);
         }
         
+        $data['course_filter'] = $course_filter;
         $this->load->view('student/resources', $data);
+    }
+    
+    public function resources_ajax() {
+        $course_id = $this->input->post('course_id');
+        
+        if (!$course_id) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'success' => false,
+                    'message' => 'Course ID is required'
+                ]));
+            return;
+        }
+        
+        // Check enrollment
+        if (!$this->Course_model->is_enrolled($this->session->userdata('user_id'), $course_id)) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'success' => false,
+                    'message' => 'Access denied. You are not enrolled in this course.'
+                ]));
+            return;
+        }
+        
+        $course = $this->Course_model->get_course_by_id($course_id);
+        $materials = $this->Material_model->get_course_materials($course_id);
+        
+        // Build HTML response
+        $html = '';
+        if (count($materials) > 0) {
+            foreach ($materials as $material) {
+                // Use relative path for download
+                $download_url = base_url('uploads/materials/' . $material->file_name);
+                
+                $html .= '<div class="col-md-6 mb-3">';
+                $html .= '<div class="card h-100">';
+                $html .= '<div class="card-body">';
+                $html .= '<h5 class="card-title"><i class="bi bi-file-earmark-text"></i> ' . $material->title . '</h5>';
+                if ($material->description) {
+                    $html .= '<p class="card-text text-muted">' . $material->description . '</p>';
+                }
+                $html .= '<div class="d-flex justify-content-between align-items-center">';
+                $html .= '<span class="badge bg-info">' . strtoupper(pathinfo($material->file_name, PATHINFO_EXTENSION)) . '</span>';
+                $html .= '<small class="text-muted">' . date('M d, Y', strtotime($material->created_at)) . '</small>';
+                $html .= '</div>';
+                $html .= '</div>';
+                $html .= '<div class="card-footer bg-white">';
+                $html .= '<a href="' . $download_url . '" class="btn btn-sm btn-primary w-100" download>';
+                $html .= '<i class="bi bi-download"></i> Download';
+                $html .= '</a>';
+                $html .= '</div>';
+                $html .= '</div>';
+                $html .= '</div>';
+            }
+        } else {
+            $html .= '<div class="col-12">';
+            $html .= '<div class="text-center py-5">';
+            $html .= '<i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>';
+            $html .= '<p class="mt-2 text-muted">No materials available for this course yet.</p>';
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+        
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'success' => true,
+                'html' => $html,
+                'course_title' => $course->title,
+                'course_code' => $course->code,
+                'material_count' => count($materials)
+            ]));
     }
     
     public function download_material($material_id) {

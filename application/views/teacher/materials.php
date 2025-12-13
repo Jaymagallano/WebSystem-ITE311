@@ -32,9 +32,9 @@
         <div class="col-md-6">
             <label for="courseFilter" class="form-label">Select Course:</label>
             <select class="form-select" id="courseFilter">
-                <option value="" selected>Choose a course...</option>
+                <option value="">Choose a course...</option>
                 <?php foreach($courses as $course): ?>
-                    <option value="<?= $course->id ?>" <?= isset($selected_course) && $selected_course->id == $course->id ? 'selected' : '' ?>>
+                    <option value="<?= $course->id ?>" <?= ($course_filter ?? '') == $course->id ? 'selected' : '' ?>>
                         <?= $course->code ?> - <?= $course->title ?>
                     </option>
                 <?php endforeach; ?>
@@ -44,11 +44,14 @@
 <?php endif; ?>
 
 <?php if(isset($selected_course)): ?>
-    <div class="row">
+    <div class="row" id="materialsTableContainer">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0"><?= $selected_course->title ?> - Materials</h5>
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" id="courseTitle"><?= $selected_course->title ?> - Materials</h5>
+                    <a href="<?= base_url('teacher/upload_material') ?>?course_id=<?= $selected_course->id ?>" class="btn btn-sm btn-primary" id="uploadBtn">
+                        <i class="bi bi-cloud-upload"></i> Upload Material
+                    </a>
                 </div>
                 <div class="card-body">
                     <?php if(isset($materials) && count($materials) > 0): ?>
@@ -62,7 +65,7 @@
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="materialsTableBody">
                                     <?php foreach($materials as $material): ?>
                                         <tr>
                                             <td>
@@ -104,7 +107,7 @@
         </div>
     </div>
 <?php else: ?>
-    <div class="row">
+    <div class="row" id="materialsTableContainer">
         <div class="col-12">
             <div class="card">
                 <div class="card-body text-center py-5">
@@ -144,16 +147,119 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Course filter change handler
+    // Course filter change handler with AJAX
     const courseFilter = document.getElementById('courseFilter');
+    const materialsTableContainer = document.getElementById('materialsTableContainer');
+    
     if (courseFilter) {
         courseFilter.addEventListener('change', function() {
             const courseId = this.value;
-            if (courseId) {
-                window.location.href = '<?= base_url('teacher/materials/') ?>' + courseId;
-            } else {
-                window.location.href = '<?= base_url('teacher/materials') ?>';
+            
+            if (!courseId) {
+                // Show empty state
+                materialsTableContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <i class="bi bi-file-earmark-text" style="font-size: 4rem; color: #ccc;"></i>
+                                <h4 class="mt-3">Select a Course</h4>
+                                <p class="text-muted">Choose a course from the dropdown above to view and manage materials.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                // Update URL
+                window.history.pushState({}, '', '<?= base_url('teacher/materials') ?>');
+                return;
             }
+            
+            // Show loading state
+            materialsTableContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Loading materials...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Perform AJAX request
+            const formData = new FormData();
+            formData.append('course_id', courseId);
+            
+            fetch('<?= base_url('teacher/materials_ajax') ?>', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update table
+                    materialsTableContainer.innerHTML = `
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">${data.course_title} - Materials</h5>
+                                    <a href="<?= base_url('teacher/upload_material') ?>?course_id=${courseId}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-cloud-upload"></i> Upload Material
+                                    </a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <th>Description</th>
+                                                    <th>File Type</th>
+                                                    <th>Uploaded</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${data.html}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Update URL without reload
+                    window.history.pushState({}, '', '<?= base_url('teacher/materials?course_id=') ?>' + courseId);
+                    
+                    // Add fade-in animation
+                    materialsTableContainer.style.opacity = '0';
+                    setTimeout(() => {
+                        materialsTableContainer.style.transition = 'opacity 0.3s';
+                        materialsTableContainer.style.opacity = '1';
+                    }, 10);
+                } else {
+                    alert('Error loading materials: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                materialsTableContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                                <h4 class="mt-3 text-danger">Error Loading Materials</h4>
+                                <p class="text-muted">An error occurred while loading the materials. Please try again.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
         });
     }
     

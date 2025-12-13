@@ -21,6 +21,7 @@ class Teacher extends CI_Controller {
         $this->load->model('Grade_model');
         $this->load->model('Material_model');
         $this->load->model('Notification_model');
+        $this->load->model('Student_model');
     }
     
     public function courses() {
@@ -105,15 +106,231 @@ class Teacher extends CI_Controller {
     public function students($course_id = null) {
         $data['user'] = $this->session->userdata();
         
-        if ($course_id) {
-            $data['course'] = $this->Course_model->get_course_by_id($course_id);
-            $data['students'] = $this->Course_model->get_enrolled_students($course_id);
+        // Get filter parameters - prioritize GET parameter over URL segment
+        $course_filter = $this->input->get('course_id') ?: $course_id;
+        $search = $this->input->get('search');
+        $status = $this->input->get('status');
+        $sort_by = $this->input->get('sort_by') ?: 'name';
+        $sort_order = $this->input->get('sort_order') ?: 'asc';
+        
+        if ($course_filter) {
+            $data['course'] = $this->Course_model->get_course_by_id($course_filter);
+            $this->db->select('users.*, enrollments.enrolled_at');
+            $this->db->from('users');
+            $this->db->join('enrollments', 'users.id = enrollments.student_id');
+            $this->db->where('enrollments.course_id', $course_filter);
+            $this->db->where('users.role', 'student');
+            
+            // Apply search filter
+            if ($search) {
+                $this->db->group_start();
+                $this->db->like('users.name', $search);
+                $this->db->or_like('users.email', $search);
+                $this->db->or_like('users.id', $search);
+                $this->db->group_end();
+            }
+            
+            // Apply sorting
+            switch($sort_by) {
+                case 'name':
+                    $this->db->order_by('users.name', $sort_order);
+                    break;
+                case 'email':
+                    $this->db->order_by('users.email', $sort_order);
+                    break;
+                case 'enrolled_date':
+                    $this->db->order_by('enrollments.enrolled_at', $sort_order);
+                    break;
+                default:
+                    $this->db->order_by('users.name', 'asc');
+            }
+            
+            $data['students'] = $this->db->get()->result();
         } else {
-            $data['students'] = $this->db->where('role', 'student')->get('users')->result();
+            $this->db->select('users.*, users.created_at');
+            $this->db->from('users');
+            $this->db->where('role', 'student');
+            
+            // Apply search filter
+            if ($search) {
+                $this->db->group_start();
+                $this->db->like('name', $search);
+                $this->db->or_like('email', $search);
+                $this->db->or_like('id', $search);
+                $this->db->group_end();
+            }
+            
+            // Apply sorting
+            switch($sort_by) {
+                case 'name':
+                    $this->db->order_by('name', $sort_order);
+                    break;
+                case 'email':
+                    $this->db->order_by('email', $sort_order);
+                    break;
+                case 'registered_date':
+                    $this->db->order_by('created_at', $sort_order);
+                    break;
+                default:
+                    $this->db->order_by('name', 'asc');
+            }
+            
+            $data['students'] = $this->db->get()->result();
         }
         
         $data['courses'] = $this->Course_model->get_teacher_courses($this->session->userdata('user_id'));
-        $this->load->view('teacher/students', $data);
+        $data['search'] = $search;
+        $data['status'] = $status;
+        $data['sort_by'] = $sort_by;
+        $data['sort_order'] = $sort_order;
+        $data['course_filter'] = $course_filter;
+        
+        // Check if AJAX request
+        if ($this->input->is_ajax_request()) {
+            // Return JSON response for AJAX
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'success' => true,
+                    'students' => $data['students'],
+                    'count' => count($data['students']),
+                    'has_course' => isset($data['course'])
+                ]));
+        } else {
+            $this->load->view('teacher/students', $data);
+        }
+    }
+    
+    public function students_ajax($course_id = null) {
+        // Get filter parameters - prioritize POST parameter
+        $course_filter = $this->input->post('course_id') ?: $course_id;
+        $search = $this->input->post('search');
+        $status = $this->input->post('status');
+        $sort_by = $this->input->post('sort_by') ?: 'name';
+        $sort_order = $this->input->post('sort_order') ?: 'asc';
+        
+        if ($course_filter) {
+            $course = $this->Course_model->get_course_by_id($course_filter);
+            $this->db->select('users.*, enrollments.enrolled_at');
+            $this->db->from('users');
+            $this->db->join('enrollments', 'users.id = enrollments.student_id');
+            $this->db->where('enrollments.course_id', $course_filter);
+            $this->db->where('users.role', 'student');
+            
+            // Apply search filter
+            if ($search) {
+                $this->db->group_start();
+                $this->db->like('users.name', $search);
+                $this->db->or_like('users.email', $search);
+                $this->db->or_like('users.id', $search);
+                $this->db->group_end();
+            }
+            
+            // Apply sorting
+            switch($sort_by) {
+                case 'name':
+                    $this->db->order_by('users.name', $sort_order);
+                    break;
+                case 'email':
+                    $this->db->order_by('users.email', $sort_order);
+                    break;
+                case 'enrolled_date':
+                    $this->db->order_by('enrollments.enrolled_at', $sort_order);
+                    break;
+                default:
+                    $this->db->order_by('users.name', 'asc');
+            }
+            
+            $students = $this->db->get()->result();
+            $has_course = true;
+        } else {
+            $course = null;
+            $this->db->select('users.*, users.created_at');
+            $this->db->from('users');
+            $this->db->where('role', 'student');
+            
+            // Apply search filter
+            if ($search) {
+                $this->db->group_start();
+                $this->db->like('name', $search);
+                $this->db->or_like('email', $search);
+                $this->db->or_like('id', $search);
+                $this->db->group_end();
+            }
+            
+            // Apply sorting
+            switch($sort_by) {
+                case 'name':
+                    $this->db->order_by('name', $sort_order);
+                    break;
+                case 'email':
+                    $this->db->order_by('email', $sort_order);
+                    break;
+                case 'registered_date':
+                    $this->db->order_by('created_at', $sort_order);
+                    break;
+                default:
+                    $this->db->order_by('name', 'asc');
+            }
+            
+            $students = $this->db->get()->result();
+            $has_course = false;
+        }
+        
+        // Build HTML response
+        $html = '';
+        if (count($students) > 0) {
+            foreach ($students as $student) {
+                $html .= '<tr>';
+                $html .= '<td><strong>#' . $student->id . '</strong></td>';
+                $html .= '<td><i class="bi bi-person-circle text-primary"></i> <strong>' . $student->name . '</strong></td>';
+                $html .= '<td><i class="bi bi-envelope"></i> ' . $student->email . '</td>';
+                
+                if ($has_course) {
+                    // Enrolled date
+                    $enrolled_date = isset($student->enrolled_at) ? date('M d, Y', strtotime($student->enrolled_at)) : 'N/A';
+                    $html .= '<td><i class="bi bi-calendar-check"></i> ' . $enrolled_date . '</td>';
+                    
+                    // Actions
+                    $html .= '<td>';
+                    $html .= '<div class="btn-group btn-group-sm">';
+                    $html .= '<a href="' . base_url('teacher/student_profile/' . $student->id) . '" class="btn btn-outline-info" title="View Profile"><i class="bi bi-eye"></i></a>';
+                    $html .= '<a href="' . base_url('teacher/student_grades/' . $course_filter . '/' . $student->id) . '" class="btn btn-outline-primary" title="View Grades"><i class="bi bi-bar-chart"></i></a>';
+                    $html .= '<a href="' . base_url('teacher/unenroll_student/' . $course_filter . '/' . $student->id) . '" class="btn btn-outline-danger" title="Unenroll" onclick="return confirm(\'Are you sure?\')"><i class="bi bi-x-circle"></i></a>';
+                    $html .= '</div>';
+                    $html .= '</td>';
+                } else {
+                    // Registered date
+                    $html .= '<td><i class="bi bi-calendar-plus"></i> ' . date('M d, Y', strtotime($student->created_at)) . '</td>';
+                    
+                    // Actions
+                    $html .= '<td><button class="btn btn-sm btn-outline-info" title="View Details" onclick="alert(\'Student ID: ' . $student->id . '\\nName: ' . $student->name . '\\nEmail: ' . $student->email . '\')"><i class="bi bi-eye"></i></button></td>';
+                }
+                
+                $html .= '</tr>';
+            }
+        } else {
+            $colspan = $has_course ? '5' : '5';
+            $html .= '<tr><td colspan="' . $colspan . '" class="text-center py-5">';
+            $html .= '<i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>';
+            $html .= '<p class="mt-2 text-muted">';
+            if ($search) {
+                $html .= 'No students found matching your search criteria.';
+            } elseif ($has_course) {
+                $html .= 'No students enrolled in this course yet.';
+            } else {
+                $html .= 'No students found.';
+            }
+            $html .= '</p></td></tr>';
+        }
+        
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'success' => true,
+                'html' => $html,
+                'count' => count($students)
+            ]));
     }
     
     public function assignments() {
@@ -260,18 +477,86 @@ class Teacher extends CI_Controller {
         $data['user'] = $this->session->userdata();
         $data['courses'] = $this->Course_model->get_teacher_courses($this->session->userdata('user_id'));
         
-        if ($course_id) {
-            $data['selected_course'] = $this->Course_model->get_course_by_id($course_id);
-            $data['students'] = $this->Course_model->get_enrolled_students($course_id);
-            $data['assignments'] = $this->Assignment_model->get_course_assignments($course_id);
+        // Get course from query parameter or URL segment
+        $course_filter = $this->input->get('course_id') ?: $course_id;
+        
+        if ($course_filter) {
+            $data['selected_course'] = $this->Course_model->get_course_by_id($course_filter);
+            $data['students'] = $this->Course_model->get_enrolled_students($course_filter);
+            $data['assignments'] = $this->Assignment_model->get_course_assignments($course_filter);
             
             // Calculate average grade for each student
             foreach ($data['students'] as $student) {
-                $student->average_grade = $this->Grade_model->get_student_average_grade($student->id, $course_id);
+                $student->average_grade = $this->Grade_model->get_student_average_grade($student->id, $course_filter);
             }
         }
         
+        $data['course_filter'] = $course_filter;
         $this->load->view('teacher/grades', $data);
+    }
+    
+    public function grades_ajax() {
+        $course_id = $this->input->post('course_id');
+        
+        if (!$course_id) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'success' => false,
+                    'message' => 'Course ID is required'
+                ]));
+            return;
+        }
+        
+        $course = $this->Course_model->get_course_by_id($course_id);
+        $students = $this->Course_model->get_enrolled_students($course_id);
+        $assignments = $this->Assignment_model->get_course_assignments($course_id);
+        
+        // Calculate average grade for each student
+        foreach ($students as $student) {
+            $student->average_grade = $this->Grade_model->get_student_average_grade($student->id, $course_id);
+        }
+        
+        // Build HTML response
+        $html = '';
+        if (count($students) > 0) {
+            foreach ($students as $student) {
+                $html .= '<tr>';
+                $html .= '<td><i class="bi bi-person-circle"></i> ' . $student->name . '</td>';
+                $html .= '<td>' . $student->email . '</td>';
+                $html .= '<td>';
+                
+                if ($student->average_grade !== null) {
+                    $grade = $student->average_grade;
+                    $badge_class = 'bg-success';
+                    if ($grade < 60) {
+                        $badge_class = 'bg-danger';
+                    } elseif ($grade < 75) {
+                        $badge_class = 'bg-warning';
+                    } elseif ($grade < 85) {
+                        $badge_class = 'bg-info';
+                    }
+                    $html .= '<span class="badge ' . $badge_class . '">' . number_format($grade, 2) . '%</span>';
+                } else {
+                    $html .= '<span class="badge bg-secondary">No grades yet</span>';
+                }
+                
+                $html .= '</td>';
+                $html .= '<td><a href="' . base_url('teacher/student_grades/' . $course_id . '/' . $student->id) . '" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> View Details</a></td>';
+                $html .= '</tr>';
+            }
+        } else {
+            $html .= '<tr><td colspan="4" class="text-center py-4">No students enrolled in this course.</td></tr>';
+        }
+        
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'success' => true,
+                'html' => $html,
+                'course_title' => $course->title,
+                'student_count' => count($students)
+            ]));
     }
     
     public function student_grades($course_id, $student_id) {
@@ -334,12 +619,65 @@ class Teacher extends CI_Controller {
         $data['user'] = $this->session->userdata();
         $data['courses'] = $this->Course_model->get_teacher_courses($this->session->userdata('user_id'));
         
-        if ($course_id) {
-            $data['selected_course'] = $this->Course_model->get_course_by_id($course_id);
-            $data['materials'] = $this->Material_model->get_course_materials($course_id);
+        // Get course from query parameter or URL segment
+        $course_filter = $this->input->get('course_id') ?: $course_id;
+        
+        if ($course_filter) {
+            $data['selected_course'] = $this->Course_model->get_course_by_id($course_filter);
+            $data['materials'] = $this->Material_model->get_course_materials($course_filter);
         }
         
+        $data['course_filter'] = $course_filter;
         $this->load->view('teacher/materials', $data);
+    }
+    
+    public function materials_ajax() {
+        $course_id = $this->input->post('course_id');
+        
+        if (!$course_id) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'success' => false,
+                    'message' => 'Course ID is required'
+                ]));
+            return;
+        }
+        
+        $course = $this->Course_model->get_course_by_id($course_id);
+        $materials = $this->Material_model->get_course_materials($course_id);
+        
+        // Build HTML response
+        $html = '';
+        if (count($materials) > 0) {
+            foreach ($materials as $material) {
+                // Use relative path for download
+                $download_url = base_url('uploads/materials/' . $material->file_name);
+                
+                $html .= '<tr>';
+                $html .= '<td><i class="bi bi-file-earmark-text"></i> <strong>' . $material->title . '</strong></td>';
+                $html .= '<td>' . $material->description . '</td>';
+                $html .= '<td><span class="badge bg-info">' . strtoupper(pathinfo($material->file_name, PATHINFO_EXTENSION)) . '</span></td>';
+                $html .= '<td>' . date('M d, Y', strtotime($material->created_at)) . '</td>';
+                $html .= '<td>';
+                $html .= '<a href="' . $download_url . '" class="btn btn-sm btn-outline-primary" download><i class="bi bi-download"></i></a> ';
+                $html .= '<a href="' . base_url('teacher/delete_material/' . $material->id) . '" class="btn btn-sm btn-outline-danger" onclick="return confirm(\'Are you sure you want to delete this material?\')"><i class="bi bi-trash"></i></a>';
+                $html .= '</td>';
+                $html .= '</tr>';
+            }
+        } else {
+            $html .= '<tr><td colspan="5" class="text-center py-4">No materials uploaded yet for this course.</td></tr>';
+        }
+        
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'success' => true,
+                'html' => $html,
+                'course_title' => $course->title,
+                'course_code' => $course->code,
+                'material_count' => count($materials)
+            ]));
     }
     
     public function upload_material() {
@@ -558,5 +896,219 @@ class Teacher extends CI_Controller {
     public function notifications() {
         $data['user'] = $this->session->userdata();
         $this->load->view('teacher/notifications', $data);
+    }
+    
+    // ==================== STUDENT PROFILE MANAGEMENT ====================
+    
+    public function student_profile($student_id) {
+        $student = $this->Student_model->get_student_by_id($student_id);
+        
+        if (!$student) {
+            $this->session->set_flashdata('error', 'Student not found.');
+            redirect('teacher/students');
+        }
+        
+        $data['user'] = $this->session->userdata();
+        $data['student'] = $student;
+        $data['courses'] = $this->Student_model->get_student_courses($student_id);
+        $data['recent_submissions'] = $this->Student_model->get_student_submissions($student_id, 5);
+        $data['stats'] = $this->Student_model->get_student_stats($student_id);
+        
+        $this->load->view('teacher/student_profile', $data);
+    }
+    
+    public function edit_student($student_id) {
+        $student = $this->Student_model->get_student_by_id($student_id);
+        
+        if (!$student) {
+            $this->session->set_flashdata('error', 'Student not found.');
+            redirect('teacher/students');
+        }
+        
+        if ($this->input->method() == 'post') {
+            $this->form_validation->set_rules('name', 'Name', 'required|trim');
+            $this->form_validation->set_rules('email', 'Email', 'required|valid_email|trim');
+            
+            if ($this->form_validation->run()) {
+                $update_data = [
+                    'name' => $this->input->post('name'),
+                    'email' => $this->input->post('email'),
+                    'phone' => $this->input->post('phone'),
+                    'address' => $this->input->post('address'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ];
+                
+                // Handle profile photo upload
+                if (!empty($_FILES['profile_photo']['name'])) {
+                    $config['upload_path'] = './uploads/profiles/';
+                    $config['allowed_types'] = 'jpg|jpeg|png|gif';
+                    $config['max_size'] = 2048; // 2MB
+                    $config['file_name'] = 'student_' . $student_id . '_' . time();
+                    
+                    if (!is_dir($config['upload_path'])) {
+                        mkdir($config['upload_path'], 0777, true);
+                    }
+                    
+                    $this->load->library('upload', $config);
+                    
+                    if ($this->upload->do_upload('profile_photo')) {
+                        $upload_data = $this->upload->data();
+                        $update_data['profile_photo'] = $upload_data['file_name'];
+                        
+                        // Delete old photo if exists
+                        if ($student->profile_photo && file_exists('./uploads/profiles/' . $student->profile_photo)) {
+                            @unlink('./uploads/profiles/' . $student->profile_photo);
+                        }
+                    }
+                }
+                
+                if ($this->Student_model->update_student($student_id, $update_data)) {
+                    $this->session->set_flashdata('success', 'Student information updated successfully!');
+                    redirect('teacher/student_profile/' . $student_id);
+                } else {
+                    $this->session->set_flashdata('error', 'Failed to update student information.');
+                }
+            }
+        }
+        
+        $data['user'] = $this->session->userdata();
+        $data['student'] = $student;
+        $this->load->view('teacher/edit_student', $data);
+    }
+    
+    // ==================== ENROLLMENT MANAGEMENT ====================
+    
+    // ==================== CSV IMPORT/EXPORT ====================
+    
+    public function export_students() {
+        $course_id = $this->input->get('course_id');
+        
+        if ($course_id) {
+            // Export students from specific course
+            $course = $this->Course_model->get_course_by_id($course_id);
+            if (!$course || $course->teacher_id != $this->session->userdata('user_id')) {
+                $this->session->set_flashdata('error', 'Access denied.');
+                redirect('teacher/students');
+            }
+            
+            $students = $this->Course_model->get_enrolled_students($course_id);
+            $filename = 'students_' . $course->code . '_' . date('Y-m-d') . '.csv';
+        } else {
+            // Export all students
+            $students = $this->Student_model->get_all_students();
+            $filename = 'all_students_' . date('Y-m-d') . '.csv';
+        }
+        
+        // Set headers for CSV download
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        
+        $output = fopen('php://output', 'w');
+        
+        // Add CSV headers
+        fputcsv($output, ['ID', 'Name', 'Email', 'Status', 'Registered Date']);
+        
+        // Add data
+        foreach ($students as $student) {
+            fputcsv($output, [
+                $student->id,
+                $student->name,
+                $student->email,
+                $student->status ?? 'active',
+                date('Y-m-d', strtotime($student->created_at))
+            ]);
+        }
+        
+        fclose($output);
+        exit;
+    }
+    
+    // ==================== REPORTS & ANALYTICS ====================
+    
+    public function reports() {
+        $data['user'] = $this->session->userdata();
+        $data['courses'] = $this->Course_model->get_teacher_courses($this->session->userdata('user_id'));
+        
+        // Get overall statistics
+        $teacher_id = $this->session->userdata('user_id');
+        
+        // Total students across all courses
+        $this->db->select('COUNT(DISTINCT enrollments.student_id) as total');
+        $this->db->from('enrollments');
+        $this->db->join('courses', 'enrollments.course_id = courses.id');
+        $this->db->where('courses.teacher_id', $teacher_id);
+        $result = $this->db->get()->row();
+        $data['total_students'] = $result->total;
+        
+        // Total assignments
+        $this->db->where('course_id IN (SELECT id FROM courses WHERE teacher_id = ' . $teacher_id . ')', NULL, FALSE);
+        $data['total_assignments'] = $this->db->count_all_results('assignments');
+        
+        // Total submissions
+        $this->db->select('COUNT(*) as total');
+        $this->db->from('assignment_submissions');
+        $this->db->join('assignments', 'assignment_submissions.assignment_id = assignments.id');
+        $this->db->join('courses', 'assignments.course_id = courses.id');
+        $this->db->where('courses.teacher_id', $teacher_id);
+        $result = $this->db->get()->row();
+        $data['total_submissions'] = $result->total;
+        
+        // Average grade across all courses
+        $this->db->select_avg('assignment_submissions.points_earned');
+        $this->db->from('assignment_submissions');
+        $this->db->join('assignments', 'assignment_submissions.assignment_id = assignments.id');
+        $this->db->join('courses', 'assignments.course_id = courses.id');
+        $this->db->where('courses.teacher_id', $teacher_id);
+        $this->db->where('assignment_submissions.status', 'graded');
+        $result = $this->db->get()->row();
+        $data['average_grade'] = $result->points_earned ?? 0;
+        
+        $this->load->view('teacher/reports', $data);
+    }
+    
+    public function course_report($course_id) {
+        // Verify course belongs to teacher
+        $course = $this->Course_model->get_course_by_id($course_id);
+        if (!$course || $course->teacher_id != $this->session->userdata('user_id')) {
+            $this->session->set_flashdata('error', 'Access denied.');
+            redirect('teacher/reports');
+        }
+        
+        $data['user'] = $this->session->userdata();
+        $data['course'] = $course;
+        
+        // Get enrolled students
+        $students = $this->Course_model->get_enrolled_students($course_id);
+        $data['total_students'] = count($students);
+        
+        // Get assignments
+        $assignments = $this->Assignment_model->get_course_assignments($course_id);
+        $data['total_assignments'] = count($assignments);
+        
+        // Calculate performance metrics
+        $performance_data = [];
+        foreach ($students as $student) {
+            $avg_grade = $this->Grade_model->get_student_average_grade($student->id, $course_id);
+            $performance_data[] = [
+                'student' => $student,
+                'average_grade' => $avg_grade
+            ];
+        }
+        
+        $data['performance_data'] = $performance_data;
+        
+        // Calculate class statistics
+        $grades = array_filter(array_column($performance_data, 'average_grade'));
+        if (!empty($grades)) {
+            $data['class_average'] = array_sum($grades) / count($grades);
+            $data['highest_grade'] = max($grades);
+            $data['lowest_grade'] = min($grades);
+        } else {
+            $data['class_average'] = 0;
+            $data['highest_grade'] = 0;
+            $data['lowest_grade'] = 0;
+        }
+        
+        $this->load->view('teacher/course_report', $data);
     }
 }

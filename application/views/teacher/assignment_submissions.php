@@ -106,7 +106,7 @@
                                         </td>
                                         <td>
                                             <?php if($submission->file_name): ?>
-                                                <a href="<?= base_url($submission->file_path) ?>" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                                <a href="<?= base_url('teacher/download_submission/'.$submission->id) ?>" class="btn btn-sm btn-outline-secondary">
                                                     <i class="bi bi-file-earmark"></i> View File
                                                 </a>
                                             <?php else: ?>

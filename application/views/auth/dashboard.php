@@ -44,7 +44,7 @@
                             <h6 class="text-muted mb-2 fw-semibold">Total Users</h6>
                             <h3 class="mb-0 fw-bold"><?= isset($total_users) ? $total_users : 0 ?></h3>
                         </div>
-                        <div class="text-primary pulse" style="font-size: 2.5rem; color: #3182ce !important;">
+                        <div class="text-primary" style="font-size: 2.5rem; color: #3182ce !important;">
                             <i class="bi bi-people-fill"></i>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                             <h6 class="text-muted mb-2 fw-semibold">Admins</h6>
                             <h3 class="mb-0 fw-bold"><?= isset($total_admins) ? $total_admins : 0 ?></h3>
                         </div>
-                        <div class="text-danger pulse" style="font-size: 2.5rem; color: #c53030 !important;">
+                        <div class="text-danger" style="font-size: 2.5rem; color: #c53030 !important;">
                             <i class="bi bi-shield-fill-check"></i>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                             <h6 class="text-muted mb-2 fw-semibold">Teachers</h6>
                             <h3 class="mb-0 fw-bold"><?= isset($total_teachers) ? $total_teachers : 0 ?></h3>
                         </div>
-                        <div class="text-info pulse" style="font-size: 2.5rem; color: #2c7a7b !important;">
+                        <div class="text-info" style="font-size: 2.5rem; color: #2c7a7b !important;">
                             <i class="bi bi-person-badge-fill"></i>
                         </div>
                     </div>
@@ -92,7 +92,7 @@
                             <h6 class="text-muted mb-2 fw-semibold">Students</h6>
                             <h3 class="mb-0 fw-bold"><?= isset($total_students) ? $total_students : 0 ?></h3>
                         </div>
-                        <div class="text-success pulse" style="font-size: 2.5rem; color: #2f855a !important;">
+                        <div class="text-success" style="font-size: 2.5rem; color: #2f855a !important;">
                             <i class="bi bi-mortarboard-fill"></i>
                         </div>
                     </div>
@@ -202,7 +202,7 @@
     <!-- Teacher Dashboard -->
     <div class="row mb-4">
         <div class="col-md-4 mb-3">
-            <div class="card stat-card student floating">
+            <div class="card stat-card student">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -210,7 +210,7 @@
                             <h3 class="mb-0 fw-bold"><?= isset($total_students) ? $total_students : 0 ?></h3>
                             <small class="text-success"><i class="bi bi-arrow-up"></i> Active learners</small>
                         </div>
-                        <div class="text-success pulse" style="font-size: 2.5rem; color: #2f855a !important;">
+                        <div class="text-success" style="font-size: 2.5rem; color: #2f855a !important;">
                             <i class="bi bi-people-fill"></i>
                         </div>
                     </div>
@@ -219,7 +219,7 @@
         </div>
         
         <div class="col-md-4 mb-3">
-            <div class="card stat-card teacher floating" style="animation-delay: 0.1s;">
+            <div class="card stat-card teacher">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -227,7 +227,7 @@
                             <h3 class="mb-0 fw-bold"><?= isset($total_courses) ? $total_courses : 0 ?></h3>
                             <small class="text-info"><i class="bi bi-book"></i> Published courses</small>
                         </div>
-                        <div class="text-info pulse" style="font-size: 2.5rem; color: #2c7a7b !important;">
+                        <div class="text-info" style="font-size: 2.5rem; color: #2c7a7b !important;">
                             <i class="bi bi-journal-bookmark-fill"></i>
                         </div>
                     </div>
@@ -236,7 +236,7 @@
         </div>
         
         <div class="col-md-4 mb-3">
-            <div class="card stat-card users floating" style="animation-delay: 0.2s;">
+            <div class="card stat-card users">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -244,7 +244,7 @@
                             <h3 class="mb-0 fw-bold"><?= isset($total_assignments) ? $total_assignments : 0 ?></h3>
                             <small class="text-primary"><i class="bi bi-clipboard-check"></i> Active tasks</small>
                         </div>
-                        <div class="text-primary pulse" style="font-size: 2.5rem; color: #3182ce !important;">
+                        <div class="text-primary" style="font-size: 2.5rem; color: #3182ce !important;">
                             <i class="bi bi-clipboard-check-fill"></i>
                         </div>
                     </div>
@@ -346,7 +346,7 @@
     <!-- Student Dashboard -->
     <div class="row mb-4">
         <div class="col-md-4 mb-3">
-            <div class="card stat-card teacher floating">
+            <div class="card stat-card teacher">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -354,7 +354,7 @@
                             <h3 class="mb-0 fw-bold"><?= isset($total_teachers) ? $total_teachers : 0 ?></h3>
                             <small class="text-info"><i class="bi bi-mortarboard"></i> Expert instructors</small>
                         </div>
-                        <div class="text-info pulse" style="font-size: 2.5rem; color: #2c7a7b !important;">
+                        <div class="text-info" style="font-size: 2.5rem; color: #2c7a7b !important;">
                             <i class="bi bi-person-badge-fill"></i>
                         </div>
                     </div>
@@ -363,7 +363,7 @@
         </div>
         
         <div class="col-md-4 mb-3">
-            <div class="card stat-card student floating" style="animation-delay: 0.1s;">
+            <div class="card stat-card student">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -371,7 +371,7 @@
                             <h3 class="mb-0 fw-bold"><?= isset($total_enrolled_courses) ? $total_enrolled_courses : 0 ?></h3>
                             <small class="text-success"><i class="bi bi-bookmark-check"></i> Active learning</small>
                         </div>
-                        <div class="text-success pulse" style="font-size: 2.5rem; color: #2f855a !important;">
+                        <div class="text-success" style="font-size: 2.5rem; color: #2f855a !important;">
                             <i class="bi bi-book-fill"></i>
                         </div>
                     </div>
@@ -380,7 +380,7 @@
         </div>
         
         <div class="col-md-4 mb-3">
-            <div class="card stat-card users floating" style="animation-delay: 0.2s;">
+            <div class="card stat-card users">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -388,7 +388,7 @@
                             <h3 class="mb-0 fw-bold"><?= isset($total_pending_assignments) ? $total_pending_assignments : 0 ?></h3>
                             <small class="text-primary"><i class="bi bi-clock"></i> To complete</small>
                         </div>
-                        <div class="text-primary pulse" style="font-size: 2.5rem; color: #3182ce !important;">
+                        <div class="text-primary" style="font-size: 2.5rem; color: #3182ce !important;">
                             <i class="bi bi-clipboard-check-fill"></i>
                         </div>
                     </div>

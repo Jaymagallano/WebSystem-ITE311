@@ -283,12 +283,6 @@
             align-items: center;
             justify-content: center;
             padding: 0 4px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
         }
         
         .notification-dropdown {
@@ -308,16 +302,7 @@
         
         .notification-dropdown.show {
             display: block;
-            animation: slideDown 0.3s ease;
         }
-        
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
                 transform: translateY(0);
             }
         }
@@ -443,15 +428,41 @@
         <div class="row">
             <!-- Sidebar -->
             <div class="col-md-2 sidebar p-0">
-                <div class="sidebar-brand">
-                    <h5 class="text-white mb-1 fw-normal">
-                        <i class="bi bi-building"></i> 
-                        <span>Learning Management System</span>
-                    </h5>
-                    <small class="text-white-50"><?= ucfirst($this->session->userdata('role')) ?> Dashboard</small>
+                <!-- User Profile Section at Top -->
+                <div class="sidebar-brand" style="padding: 20px;">
+                    <div class="text-center mb-3">
+                        <div class="rounded-circle bg-white d-inline-flex align-items-center justify-content-center" 
+                             style="width: 60px; height: 60px; font-size: 1.8rem; color: #2c5282;">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                    </div>
+                    <h6 class="text-white text-center mb-2 fw-bold"><?= $this->session->userdata('name') ?></h6>
+                    
+                    <!-- Role Badge with Dropdown -->
+                    <div class="text-center">
+                        <div class="dropdown">
+                            <button class="badge dropdown-toggle" 
+                                    type="button" 
+                                    id="roleBadgeDropdown" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false"
+                                    style="background: rgba(255,255,255,0.2); border: none; cursor: pointer; font-size: 0.85rem; padding: 6px 12px;">
+                                <?= ucfirst($this->session->userdata('role')) ?>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="roleBadgeDropdown" style="min-width: 150px;">
+                                <li>
+                                    <a class="dropdown-item text-danger" href="<?= base_url('auth/logout') ?>">
+                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 
                 <nav class="nav flex-column px-3">
+                    <hr class="text-white my-2">
+                    
                     <!-- Common Menu Items -->
                     <a class="nav-link <?= $this->uri->segment(1) == 'dashboard' ? 'active' : '' ?>" href="<?= base_url('dashboard') ?>">
                         <i class="bi bi-speedometer2"></i> Dashboard
@@ -488,6 +499,9 @@
                         <a class="nav-link <?= $this->uri->segment(2) == 'materials' ? 'active' : '' ?>" href="<?= base_url('teacher/materials') ?>">
                             <i class="bi bi-file-earmark-text"></i> Materials
                         </a>
+                        <a class="nav-link <?= $this->uri->segment(2) == 'reports' ? 'active' : '' ?>" href="<?= base_url('teacher/reports') ?>">
+                            <i class="bi bi-graph-up"></i> Reports
+                        </a>
                                         <?php elseif($this->session->userdata('role') == 'student'): ?>
                         <!-- Student Menu Items -->
                         <a class="nav-link <?= $this->uri->segment(2) == 'courses' ? 'active' : '' ?>" href="<?= base_url('student/courses') ?>">
@@ -506,15 +520,6 @@
                             <i class="bi bi-download"></i> Resources
                         </a>
                     <?php endif; ?>
-                    
-                    <!-- Common Menu Items -->
-                    <hr class="text-white">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-person-circle"></i> Profile
-                    </a>
-                    <a class="nav-link" href="<?= base_url('logout') ?>">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </a>
                 </nav>
             </div>
             

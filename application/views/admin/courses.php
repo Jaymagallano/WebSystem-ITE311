@@ -16,7 +16,18 @@
 
 <div class="row mb-4">
     <div class="col-12">
-        <h2><i class="bi bi-book"></i> Manage Courses</h2>
+        <div class="card" style="background: var(--primary-color); color: white; border: none;">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-1 fw-normal">
+                            <i class="bi bi-book me-2"></i>Course Management
+                        </h3>
+                        <p class="mb-0 small">Manage all courses in the system</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -38,7 +49,7 @@
                         </thead>
                         <tbody>
                             <?php if(isset($courses) && count($courses) > 0): ?>
-                                                                <?php foreach($courses as $course): ?>
+                                <?php foreach($courses as $course): ?>
                                     <tr>
                                         <td><?= $course->id ?></td>
                                         <td><span class="badge bg-info"><?= $course->code ?></span></td>
@@ -70,7 +81,7 @@
                 </div>
             </div>
         </div>
-        </div>
+    </div>
 </div>
 
 <!-- View Modals -->

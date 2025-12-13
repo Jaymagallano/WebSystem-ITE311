@@ -80,14 +80,14 @@
                                         </td>
                                         <td><?= date('M d, Y', strtotime($grade->submitted_at)) ?></td>
                                         <td>
-                                            <?php if($grade->feedback): ?>
+                                            <?php if(!empty($grade->feedback)): ?>
                                                 <button class="btn btn-sm btn-outline-info view-feedback-btn" 
                                                         data-feedback="<?= htmlspecialchars($grade->feedback) ?>"
                                                         data-assignment="<?= htmlspecialchars($grade->assignment_title) ?>">
-                                                    <i class="bi bi-chat-text"></i> View
+                                                    <i class="bi bi-chat-text"></i> View Feedback
                                                 </button>
                                             <?php else: ?>
-                                                <span class="text-muted">-</span>
+                                                <span class="text-muted"><i class="bi bi-dash-circle"></i> No feedback</span>
                                             <?php endif; ?>
                                         </td>
                                     </tr>
@@ -108,19 +108,31 @@
     </div>
 </div>
 
-<!-- Feedback Modal (Reusable) -->
+<!-- Feedback Modal -->
 <div class="modal fade" id="feedbackModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Teacher Feedback - <span id="assignmentName"></span></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-chat-left-quote"></i> Teacher Feedback
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p id="feedbackContent"></p>
+                <div class="mb-3">
+                    <label class="text-muted small">Assignment:</label>
+                    <h6 id="assignmentName" class="mb-0"></h6>
+                </div>
+                <hr>
+                <div class="feedback-content">
+                    <label class="text-muted small">Feedback:</label>
+                    <div id="feedbackContent" class="p-3 bg-light rounded" style="white-space: pre-wrap;"></div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Close
+                </button>
             </div>
         </div>
     </div>
@@ -139,9 +151,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const feedback = this.dataset.feedback;
             const assignmentName = this.dataset.assignment;
             
+            console.log('Feedback:', feedback); // Debug
+            console.log('Assignment:', assignmentName); // Debug
+            
             // Update modal content
             document.getElementById('assignmentName').textContent = assignmentName;
-            document.getElementById('feedbackContent').innerHTML = feedback.replace(/\n/g, '<br>');
+            document.getElementById('feedbackContent').textContent = feedback;
             
             // Show modal
             feedbackModal.show();
