@@ -25,7 +25,21 @@ class Teacher extends CI_Controller {
     
     public function courses() {
         $data['user'] = $this->session->userdata();
-        $data['courses'] = $this->Course_model->get_teacher_courses($this->session->userdata('user_id'));
+        $courses = $this->Course_model->get_teacher_courses($this->session->userdata('user_id'));
+        
+        // Add counts for each course
+        foreach ($courses as $course) {
+            // Count enrolled students
+            $course->student_count = count($this->Course_model->get_enrolled_students($course->id));
+            
+            // Count assignments
+            $course->assignment_count = $this->db->where('course_id', $course->id)->count_all_results('assignments');
+            
+            // Count materials
+            $course->material_count = $this->db->where('course_id', $course->id)->count_all_results('materials');
+        }
+        
+        $data['courses'] = $courses;
         $this->load->view('teacher/courses', $data);
     }
     

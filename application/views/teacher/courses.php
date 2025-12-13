@@ -65,21 +65,21 @@
                                 <div class="stat-item">
                                     <i class="bi bi-people-fill text-primary"></i>
                                     <small class="d-block text-muted">Students</small>
-                                    <strong>0</strong>
+                                    <strong><?= $course->student_count ?? 0 ?></strong>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="stat-item">
                                     <i class="bi bi-clipboard-check-fill text-success"></i>
                                     <small class="d-block text-muted">Tasks</small>
-                                    <strong>0</strong>
+                                    <strong><?= $course->assignment_count ?? 0 ?></strong>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="stat-item">
                                     <i class="bi bi-file-earmark-fill text-warning"></i>
                                     <small class="d-block text-muted">Files</small>
-                                    <strong>0</strong>
+                                    <strong><?= $course->material_count ?? 0 ?></strong>
                                 </div>
                             </div>
                         </div>
