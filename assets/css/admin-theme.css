@@ -1,32 +1,82 @@
-/* Enhanced Admin Theme - Additional Styles */
+/* ============================================
+   AdminLTE Theme - Admin, Teacher & Student Dashboard
+   ============================================ */
 
-/* Custom Scrollbar */
+/* Unique AdminLTE-Inspired Color Variables */
+:root {
+    /* Primary Colors - Deep Purple/Indigo */
+    --adminlte-primary: #6366f1;
+    --adminlte-primary-dark: #4f46e5;
+    --adminlte-primary-light: #818cf8;
+    
+    /* Secondary Colors - Vibrant & Modern */
+    --adminlte-secondary: #64748b;
+    --adminlte-success: #10b981;
+    --adminlte-info: #06b6d4;
+    --adminlte-warning: #f59e0b;
+    --adminlte-danger: #ef4444;
+    
+    /* Sidebar Colors - Dark Slate */
+    --adminlte-sidebar-dark: #1e293b;
+    --adminlte-sidebar-light: #f1f5f9;
+    
+    /* Background Colors - Soft Gray */
+    --adminlte-bg-light: #f8fafc;
+    --adminlte-bg-white: #ffffff;
+    
+    /* Text Colors */
+    --adminlte-text-dark: #1e293b;
+    --adminlte-text-muted: #64748b;
+    
+    /* Border Colors */
+    --adminlte-border: #e2e8f0;
+    
+    /* Gradients - Vibrant & Modern */
+    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --info-gradient: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    --secondary-gradient: linear-gradient(135deg, #64748b 0%, #475569 100%);
+}
+
+/* Body & Background */
+body {
+    background: var(--adminlte-bg-light);
+    font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--adminlte-text-dark);
+}
+
+/* Custom Scrollbar - AdminLTE Style */
 ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    background: #f1f1f1;
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+    background: var(--adminlte-primary);
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #2c5282 0%, #3182ce 100%);
+    background: var(--adminlte-primary-dark);
 }
 
-/* Loading Animation */
+/* ============================================
+   LOADING ANIMATION - AdminLTE Style
+   ============================================ */
 .loading-spinner {
     display: inline-block;
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
+    border: 3px solid rgba(99, 102, 241, 0.3);
     border-radius: 50%;
-    border-top-color: #fff;
+    border-top-color: var(--adminlte-primary);
     animation: spin 1s ease-in-out infinite;
 }
 
@@ -34,17 +84,27 @@
     to { transform: rotate(360deg); }
 }
 
-/* Enhanced Tooltips */
+/* ============================================
+   TOOLTIPS - AdminLTE Style
+   ============================================ */
 [data-bs-toggle="tooltip"] {
     cursor: pointer;
 }
 
-/* Notification Badge */
+.tooltip-inner {
+    background: var(--adminlte-text-dark);
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+}
+
+/* ============================================
+   NOTIFICATION BADGE - AdminLTE Style
+   ============================================ */
 .notification-badge {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+    background: var(--adminlte-danger);
     color: white;
     border-radius: 50%;
     width: 20px;
@@ -57,212 +117,551 @@
     animation: pulse 2s infinite;
 }
 
-/* Enhanced Form Controls */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* ============================================
+   STAT CARDS - AdminLTE Style
+   ============================================ */
+.stat-card {
+    border: none;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.stat-card:hover {
+    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 4px 8px rgba(0,0,0,.25);
+    transform: translateY(-2px);
+}
+
+.stat-card.users {
+    border-top: 3px solid var(--adminlte-primary);
+}
+
+.stat-card.admin {
+    border-top: 3px solid var(--adminlte-danger);
+}
+
+.stat-card.teacher {
+    border-top: 3px solid var(--adminlte-info);
+}
+
+.stat-card.student {
+    border-top: 3px solid var(--adminlte-success);
+}
+
+.stat-card .card-body {
+    padding: 1.25rem;
+}
+
+.stat-card h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--adminlte-text-dark);
+}
+
+.stat-card h6 {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   CARDS - AdminLTE Style
+   ============================================ */
+.card {
+    border: none;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+    margin-bottom: 1rem;
+    background: var(--adminlte-bg-white);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--adminlte-border);
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+}
+
+.card-header.bg-white {
+    background: var(--adminlte-bg-white) !important;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* Welcome Card */
+.card[style*="var(--primary-color)"] {
+    background: var(--primary-gradient) !important;
+    border: none;
+    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+}
+
+/* ============================================
+   BUTTONS - AdminLTE Style
+   ============================================ */
+.btn {
+    border-radius: 0.25rem;
+    font-weight: 400;
+    padding: 0.375rem 0.75rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-primary {
+    background: var(--adminlte-primary);
+    border-color: var(--adminlte-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--adminlte-primary-dark);
+    border-color: var(--adminlte-primary-dark);
+    color: white;
+}
+
+.btn-success {
+    background: var(--adminlte-success);
+    border-color: var(--adminlte-success);
+}
+
+.btn-success:hover {
+    background: #059669;
+    border-color: #047857;
+}
+
+.btn-info {
+    background: var(--adminlte-info);
+    border-color: var(--adminlte-info);
+}
+
+.btn-info:hover {
+    background: #0891b2;
+    border-color: #0e7490;
+}
+
+.btn-warning {
+    background: var(--adminlte-warning);
+    border-color: var(--adminlte-warning);
+    color: #212529;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+    border-color: #b45309;
+}
+
+.btn-danger {
+    background: var(--adminlte-danger);
+    border-color: var(--adminlte-danger);
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    border-color: #b91c1c;
+}
+
+.btn-outline-primary {
+    color: var(--adminlte-primary);
+    border-color: var(--adminlte-primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--adminlte-primary);
+    border-color: var(--adminlte-primary);
+    color: white;
+}
+
+.btn-outline-success {
+    color: var(--adminlte-success);
+    border-color: var(--adminlte-success);
+}
+
+.btn-outline-success:hover {
+    background: var(--adminlte-success);
+    border-color: var(--adminlte-success);
+    color: white;
+}
+
+.btn-outline-info {
+    color: var(--adminlte-info);
+    border-color: var(--adminlte-info);
+}
+
+.btn-outline-info:hover {
+    background: var(--adminlte-info);
+    border-color: var(--adminlte-info);
+    color: white;
+}
+
+.btn-outline-warning {
+    color: var(--adminlte-warning);
+    border-color: var(--adminlte-warning);
+}
+
+.btn-outline-warning:hover {
+    background: var(--adminlte-warning);
+    border-color: var(--adminlte-warning);
+    color: #212529;
+}
+
+/* ============================================
+   BADGES - AdminLTE Style
+   ============================================ */
+.badge {
+    font-weight: 600;
+    padding: 0.35em 0.65em;
+    border-radius: 0.25rem;
+}
+
+/* Role Badges */
+.badge[style*="linear-gradient(135deg, #c53030"] {
+    background: var(--danger-gradient) !important;
+}
+
+.badge[style*="linear-gradient(135deg, #2c7a7b"] {
+    background: var(--info-gradient) !important;
+}
+
+.badge[style*="linear-gradient(135deg, #2f855a"] {
+    background: var(--success-gradient) !important;
+}
+
+/* ============================================
+   TABLES - AdminLTE Style
+   ============================================ */
+.table {
+    color: var(--adminlte-text-dark);
+}
+
+.table thead th {
+    border-bottom: 2px solid var(--adminlte-border);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+    color: var(--adminlte-text-muted);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(99, 102, 241, 0.05);
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* ============================================
+   ALERTS - AdminLTE Style
+   ============================================ */
+.alert {
+    border: none;
+    border-radius: 0.25rem;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    background-color: #d1fae5;
+    border-left-color: var(--adminlte-success);
+    color: #065f46;
+}
+
+.alert-danger {
+    background-color: #fee2e2;
+    border-left-color: var(--adminlte-danger);
+    color: #991b1b;
+}
+
+.alert-info {
+    background-color: #cffafe;
+    border-left-color: var(--adminlte-info);
+    color: #164e63;
+}
+
+.alert-warning {
+    background-color: #fef3c7;
+    border-left-color: var(--adminlte-warning);
+    color: #92400e;
+}
+
+/* ============================================
+   FORM CONTROLS - AdminLTE Style
+   ============================================ */
+.form-control {
+    border: 1px solid var(--adminlte-border);
+    border-radius: 0.25rem;
+}
+
 .form-control:focus {
-    border-color: #3182ce;
-    box-shadow: 0 0 0 0.2rem rgba(49, 130, 206, 0.2);
-    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--adminlte-primary);
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
 }
 
 .form-select:focus {
-    border-color: #3182ce;
-    box-shadow: 0 0 0 0.2rem rgba(49, 130, 206, 0.2);
+    border-color: var(--adminlte-primary);
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
 }
 
-/* Enhanced Modals */
+/* ============================================
+   MODALS - AdminLTE Style
+   ============================================ */
 .modal-content {
     border: none;
-    border-radius: 15px;
-    backdrop-filter: blur(20px);
-    background: rgba(255, 255, 255, 0.98);
+    border-radius: 0.3rem;
+    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
 }
 
 .modal-header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    background: linear-gradient(135deg, #2c5282 0%, #2a4365 100%);
-    color: white;
-    border-radius: 15px 15px 0 0;
-    padding: 18px 24px;
+    border-bottom: 1px solid var(--adminlte-border);
+    background: var(--adminlte-bg-white);
+    padding: 1rem 1.25rem;
 }
 
-/* Enhanced Alerts */
-.alert {
-    border: none;
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
+.modal-header .modal-title {
+    font-weight: 600;
+    color: var(--adminlte-text-dark);
 }
 
-.alert::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
+/* ============================================
+   ICON COLORS - AdminLTE Style
+   ============================================ */
+.text-primary {
+    color: var(--adminlte-primary) !important;
 }
 
-.alert-success::before {
-    background: linear-gradient(135deg, #2f855a 0%, #276749 100%);
+.text-success {
+    color: var(--adminlte-success) !important;
 }
 
-.alert-danger::before {
-    background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+.text-info {
+    color: var(--adminlte-info) !important;
 }
 
-.alert-info::before {
-    background: linear-gradient(135deg, #2c7a7b 0%, #285e61 100%);
+.text-warning {
+    color: var(--adminlte-warning) !important;
 }
 
-.alert-warning::before {
-    background: linear-gradient(135deg, #dd6b20 0%, #c05621 100%);
+.text-danger {
+    color: var(--adminlte-danger) !important;
 }
 
-/* Enhanced Pagination */
+.text-muted {
+    color: var(--adminlte-text-muted) !important;
+}
+
+/* ============================================
+   PAGINATION - AdminLTE Style
+   ============================================ */
 .pagination .page-link {
-    border: none;
-    border-radius: 8px;
-    margin: 0 3px;
-    color: #2c5282;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s;
-    padding: 8px 14px;
+    border: 1px solid var(--adminlte-border);
+    border-radius: 0.25rem;
+    margin: 0 2px;
+    color: var(--adminlte-primary);
+    background: var(--adminlte-bg-white);
+    transition: all 0.15s ease-in-out;
+    padding: 0.375rem 0.75rem;
 }
 
 .pagination .page-link:hover {
-    background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+    background: var(--adminlte-primary);
+    border-color: var(--adminlte-primary);
     color: white;
-    transform: translateY(-1px);
 }
 
 .pagination .page-item.active .page-link {
-    background: linear-gradient(135deg, #2c5282 0%, #2a4365 100%);
+    background: var(--adminlte-primary);
+    border-color: var(--adminlte-primary);
     color: white;
 }
 
-/* Enhanced Breadcrumb */
+/* ============================================
+   BREADCRUMB - AdminLTE Style
+   ============================================ */
 .breadcrumb {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border-radius: 10px;
-    padding: 12px 18px;
+    background: transparent;
+    padding: 0.75rem 0;
+    margin-bottom: 1rem;
+}
+
+.breadcrumb-item {
+    color: var(--adminlte-text-muted);
 }
 
 .breadcrumb-item + .breadcrumb-item::before {
-    content: "›";
-    font-weight: bold;
-    color: #3182ce;
+    content: "/";
+    color: var(--adminlte-text-muted);
 }
 
-/* Enhanced Progress Bars */
+.breadcrumb-item.active {
+    color: var(--adminlte-text-dark);
+}
+
+/* ============================================
+   PROGRESS BARS - AdminLTE Style
+   ============================================ */
 .progress {
-    height: 10px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.2);
+    height: 1rem;
+    border-radius: 0.25rem;
+    background-color: #e9ecef;
     overflow: hidden;
 }
 
 .progress-bar {
-    background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
-    border-radius: 10px;
+    background: var(--adminlte-primary);
     transition: width 0.6s ease;
 }
 
-/* Enhanced Dropdowns */
+.progress-bar.bg-success {
+    background: var(--adminlte-success) !important;
+}
+
+.progress-bar.bg-info {
+    background: var(--adminlte-info) !important;
+}
+
+.progress-bar.bg-warning {
+    background: var(--adminlte-warning) !important;
+}
+
+.progress-bar.bg-danger {
+    background: var(--adminlte-danger) !important;
+}
+
+/* ============================================
+   DROPDOWNS - AdminLTE Style
+   ============================================ */
 .dropdown-menu {
-    border: none;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    padding: 8px;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: 0.25rem;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.175);
+    padding: 0.5rem 0;
 }
 
 .dropdown-item {
-    border-radius: 8px;
-    margin: 2px 0;
-    transition: all 0.3s;
-    padding: 10px 14px;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.15s ease-in-out;
+    color: var(--adminlte-text-dark);
 }
 
 .dropdown-item:hover {
-    background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
-    color: white;
-    transform: translateX(3px);
+    background-color: #f8f9fa;
+    color: var(--adminlte-text-dark);
 }
 
-/* Enhanced List Groups */
+.dropdown-item:active {
+    background-color: var(--adminlte-primary);
+    color: white;
+}
+
+/* ============================================
+   LIST GROUPS - AdminLTE Style
+   ============================================ */
 .list-group-item {
-    border: none;
-    border-radius: 10px;
-    margin: 5px 0;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s;
+    border: 1px solid var(--adminlte-border);
+    background: var(--adminlte-bg-white);
+    transition: all 0.15s ease-in-out;
 }
 
 .list-group-item:hover {
-    background: rgba(49, 130, 206, 0.08);
-    transform: translateX(3px);
+    background-color: #f8f9fa;
 }
 
-/* Enhanced Tabs */
+.list-group-item.active {
+    background-color: var(--adminlte-primary);
+    border-color: var(--adminlte-primary);
+}
+
+/* ============================================
+   TABS - AdminLTE Style
+   ============================================ */
 .nav-tabs {
-    border-bottom: none;
+    border-bottom: 1px solid var(--adminlte-border);
 }
 
 .nav-tabs .nav-link {
-    border: none;
-    border-radius: 10px 10px 0 0;
-    background: rgba(255, 255, 255, 0.6);
-    color: #2c5282;
-    margin-right: 4px;
-    transition: all 0.3s;
-    padding: 12px 20px;
+    border: 1px solid transparent;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    color: var(--adminlte-text-muted);
+    transition: all 0.15s ease-in-out;
 }
 
 .nav-tabs .nav-link:hover {
-    background: rgba(49, 130, 206, 0.1);
+    border-color: #e9ecef #e9ecef var(--adminlte-border);
+    color: var(--adminlte-text-dark);
 }
 
 .nav-tabs .nav-link.active {
-    background: linear-gradient(135deg, #2c5282 0%, #2a4365 100%);
-    color: white;
+    color: var(--adminlte-text-dark);
+    background-color: var(--adminlte-bg-white);
+    border-color: var(--adminlte-border) var(--adminlte-border) var(--adminlte-bg-white);
 }
 
-/* Enhanced Accordion */
+/* ============================================
+   ACCORDION - AdminLTE Style
+   ============================================ */
 .accordion-button {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border: none;
-    border-radius: 10px;
-    color: #2c5282;
-    font-weight: 500;
+    background: var(--adminlte-bg-white);
+    color: var(--adminlte-text-dark);
+    font-weight: 400;
 }
 
 .accordion-button:not(.collapsed) {
-    background: linear-gradient(135deg, #2c5282 0%, #2a4365 100%);
-    color: white;
+    background-color: #e0e7ff;
+    color: var(--adminlte-primary);
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
 }
 
-.accordion-button::after {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%232c5282'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+.accordion-button:focus {
+    border-color: var(--adminlte-primary);
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
 }
 
-/* Enhanced Offcanvas */
+/* ============================================
+   OFFCANVAS - AdminLTE Style
+   ============================================ */
 .offcanvas {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
+    background: var(--adminlte-bg-white);
 }
 
 .offcanvas-header {
-    background: linear-gradient(135deg, #2c5282 0%, #2a4365 100%);
-    color: white;
+    background: var(--adminlte-bg-white);
+    border-bottom: 1px solid var(--adminlte-border);
 }
 
-/* Responsive Enhancements */
+/* ============================================
+   QUICK ACTIONS CARD - AdminLTE Style
+   ============================================ */
+.card-header[style*="var(--primary-gradient)"] {
+    background: var(--primary-gradient) !important;
+    color: white;
+    border: none;
+}
+
+/* Quick Action Buttons */
+.btn-lg.text-start {
+    text-align: left !important;
+    border-width: 2px;
+}
+
+.btn-lg.text-start:hover {
+    transform: translateX(5px);
+}
+
+/* ============================================
+   RESPONSIVE - AdminLTE Style
+   ============================================ */
 @media (max-width: 768px) {
     .sidebar {
         position: fixed;
@@ -307,9 +706,101 @@
     .stat-card .card-body {
         padding: 1rem;
     }
+    
+    .stat-card h3 {
+        font-size: 1.5rem;
+    }
 }
 
-/* Print Styles */
+/* ============================================
+   NAVBAR - AdminLTE Style
+   ============================================ */
+.navbar {
+    background: var(--adminlte-bg-white) !important;
+    border-bottom: 1px solid var(--adminlte-border);
+    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+}
+
+.navbar .nav-link {
+    color: var(--adminlte-text-dark);
+    transition: all 0.15s ease-in-out;
+}
+
+.navbar .nav-link:hover {
+    color: var(--adminlte-primary);
+}
+
+.navbar .nav-link.active {
+    color: var(--adminlte-primary);
+    font-weight: 600;
+}
+
+/* ============================================
+   SIDEBAR - AdminLTE Style
+   ============================================ */
+.sidebar {
+    background: var(--adminlte-sidebar-dark);
+    color: #c2c7d0;
+}
+
+.sidebar .nav-link {
+    color: #c2c7d0;
+    transition: all 0.15s ease-in-out;
+}
+
+.sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.sidebar .nav-link.active {
+    background: var(--adminlte-primary);
+    color: white;
+}
+
+/* ============================================
+   UTILITY CLASSES - AdminLTE Style
+   ============================================ */
+.fw-semibold {
+    font-weight: 600 !important;
+}
+
+.fw-bold {
+    font-weight: 700 !important;
+}
+
+.fw-normal {
+    font-weight: 400 !important;
+}
+
+.small {
+    font-size: 0.875rem;
+}
+
+/* Background Utilities */
+.bg-primary {
+    background: var(--adminlte-primary) !important;
+}
+
+.bg-success {
+    background: var(--adminlte-success) !important;
+}
+
+.bg-info {
+    background: var(--adminlte-info) !important;
+}
+
+.bg-warning {
+    background: var(--adminlte-warning) !important;
+}
+
+.bg-danger {
+    background: var(--adminlte-danger) !important;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
 @media print {
     .sidebar,
     .navbar,
@@ -328,27 +819,100 @@
     .main-content {
         margin-left: 0 !important;
     }
-}
-
-/* Dark Mode Support (Future Enhancement) */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --primary-gradient: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
-        --glass-bg: rgba(0, 0, 0, 0.25);
-        --glass-border: rgba(255, 255, 255, 0.1);
-    }
     
     body {
-        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-        color: #e2e8f0;
+        background: white;
     }
-    
-    .card {
-        background: rgba(0, 0, 0, 0.3);
-        color: #e2e8f0;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+.icon-bounce {
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
     }
-    
-    .navbar {
-        background: rgba(0, 0, 0, 0.8) !important;
+    40% {
+        transform: translateY(-10px);
     }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.floating {
+    animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* ============================================
+   HOVER EFFECTS - AdminLTE Style
+   ============================================ */
+.card:hover {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+/* ============================================
+   CUSTOM COMPONENTS
+   ============================================ */
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--adminlte-text-dark);
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--adminlte-text-dark);
+    margin-bottom: 0.75rem;
+}
+
+/* Icon Styling */
+.bi {
+    vertical-align: middle;
+}
+
+/* ============================================
+   FOCUS STATES - AdminLTE Style
+   ============================================ */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+}
+
+/* ============================================
+   TRANSITIONS
+   ============================================ */
+* {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-in-out;
+}
+
+/* Disable transitions for specific elements */
+.loading-spinner,
+.notification-badge,
+.icon-bounce,
+.floating {
+    transition: none;
 }

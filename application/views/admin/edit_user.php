@@ -29,11 +29,16 @@
                     
                     <div class="mb-3">
                         <label for="role" class="form-label">Role *</label>
-                        <select class="form-select" id="role" name="role" required>
-                            <option value="admin" <?= set_select('role', 'admin', $edit_user->role == 'admin') ?>>Admin</option>
-                            <option value="teacher" <?= set_select('role', 'teacher', $edit_user->role == 'teacher') ?>>Teacher</option>
-                            <option value="student" <?= set_select('role', 'student', $edit_user->role == 'student') ?>>Student</option>
+                        <select class="form-select" id="role" name="role" required <?= (isset($is_self_edit) && $is_self_edit) || (isset($disable_admin_role) && $disable_admin_role) ? 'data-restricted="true"' : '' ?>>
+                            <option value="admin" <?= set_select('role', 'admin', $edit_user->role == 'admin') ?> <?= isset($disable_admin_role) && $disable_admin_role ? 'disabled' : '' ?>>Admin</option>
+                            <option value="teacher" <?= set_select('role', 'teacher', $edit_user->role == 'teacher') ?> <?= (isset($is_self_edit) && $is_self_edit && $edit_user->role != 'teacher') ? 'disabled' : '' ?>>Teacher</option>
+                            <option value="student" <?= set_select('role', 'student', $edit_user->role == 'student') ?> <?= (isset($is_self_edit) && $is_self_edit && $edit_user->role != 'student') ? 'disabled' : '' ?>>Student</option>
                         </select>
+                        <?php if (isset($is_self_edit) && $is_self_edit): ?>
+                            <small class="text-muted">You cannot change your own role</small>
+                        <?php elseif (isset($disable_admin_role) && $disable_admin_role): ?>
+                            <small class="text-muted">Admin role is not available for teacher and student users</small>
+                        <?php endif; ?>
                     </div>
                     
                     <div class="d-flex justify-content-between">

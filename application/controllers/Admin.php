@@ -75,6 +75,18 @@ class Admin extends CI_Controller {
                     redirect('admin/edit_user/' . $user_id);
                 }
                 
+                // Prevent changing teacher role to admin
+                if ($edit_user->role == 'teacher' && $this->input->post('role') == 'admin') {
+                    $this->session->set_flashdata('error', 'Teacher role cannot be changed to admin.');
+                    redirect('admin/edit_user/' . $user_id);
+                }
+                
+                // Prevent changing student role to admin
+                if ($edit_user->role == 'student' && $this->input->post('role') == 'admin') {
+                    $this->session->set_flashdata('error', 'Student role cannot be changed to admin.');
+                    redirect('admin/edit_user/' . $user_id);
+                }
+                
                 $data = array(
                     'name' => $this->input->post('name'),
                     'role' => $this->input->post('role'),
@@ -95,6 +107,10 @@ class Admin extends CI_Controller {
         
         $data['user'] = $this->session->userdata();
         $data['edit_user'] = $edit_user;
+        // Check if this is self-editing
+        $data['is_self_edit'] = ($user_id == $this->session->userdata('user_id'));
+        // Disable admin role selection for teacher and student users (similar to admin self-edit restriction)
+        $data['disable_admin_role'] = ($edit_user->role == 'teacher' || $edit_user->role == 'student');
         $this->load->view('admin/edit_user', $data);
     }
     
