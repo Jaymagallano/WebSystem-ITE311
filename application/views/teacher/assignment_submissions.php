@@ -202,8 +202,20 @@
                             
                             <div class="mb-3">
                                 <label class="form-label"><strong>Submitted File:</strong></label>
+                                <?php 
+                                // Fix file path - remove full Windows path if present
+                                $clean_path = $submission->file_path;
+                                if (strpos($clean_path, 'htdocs') !== false) {
+                                    $clean_path = substr($clean_path, strpos($clean_path, 'htdocs') + 7);
+                                    $clean_path = str_replace('\\', '/', $clean_path);
+                                    $clean_path = ltrim($clean_path, '/');
+                                    if (strpos($clean_path, 'ITE311-MAGALLANO/') === 0) {
+                                        $clean_path = substr($clean_path, strlen('ITE311-MAGALLANO/'));
+                                    }
+                                }
+                                ?>
                                 <div>
-                                    <a href="<?= base_url($submission->file_path) ?>" target="_blank" class="btn btn-outline-secondary">
+                                    <a href="<?= base_url($clean_path) ?>" target="_blank" class="btn btn-outline-secondary">
                                         <i class="bi bi-file-earmark"></i> <?= $submission->file_name ?>
                                     </a>
                                 </div>

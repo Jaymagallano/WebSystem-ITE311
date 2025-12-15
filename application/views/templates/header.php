@@ -76,6 +76,7 @@
             font-weight: 400;
             font-size: 15px;
             border-left: 3px solid transparent;
+            white-space: nowrap;
         }
         
 

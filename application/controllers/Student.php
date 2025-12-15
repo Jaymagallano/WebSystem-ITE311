@@ -114,11 +114,14 @@ class Student extends CI_Controller {
             if ($this->upload->do_upload('file')) {
                 $upload_data = $this->upload->data();
                 
+                // Use relative path instead of full Windows path
+                $relative_path = 'uploads/submissions/' . $upload_data['file_name'];
+                
                 $data = array(
                     'assignment_id' => $assignment_id,
                     'student_id' => $this->session->userdata('user_id'),
                     'file_name' => $upload_data['file_name'],
-                    'file_path' => $upload_data['full_path'],
+                    'file_path' => $relative_path,
                     'submitted_at' => date('Y-m-d H:i:s')
                 );
                 

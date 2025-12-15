@@ -1,6 +1,9 @@
 # 🛡️ SMART SECURITY - PROTECT BUT ALLOW LEGITIMATE ACCESS 🛡️
 RewriteEngine On
 
+# Custom 404 Error Page
+ErrorDocument 404 /ITE311-MAGALLANO/404.php
+
 # Allow static files (CSS, JS, Images, Fonts)
 RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ [NC]
 RewriteRule .* - [S=25]

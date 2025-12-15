@@ -33,8 +33,21 @@
                 <p><strong>Name:</strong> <?= $submission->student_name ?></p>
                 <p><strong>Submitted:</strong> <?= date('F j, Y g:i A', strtotime($submission->submitted_at)) ?></p>
                 <?php if ($submission->file_name): ?>
+                    <?php 
+                    // Fix file path - remove full Windows path if present
+                    $clean_path = $submission->file_path;
+                    if (strpos($clean_path, 'htdocs') !== false) {
+                        $clean_path = substr($clean_path, strpos($clean_path, 'htdocs') + 7);
+                        $clean_path = str_replace('\\', '/', $clean_path);
+                        $clean_path = ltrim($clean_path, '/');
+                        // Remove project folder if present
+                        if (strpos($clean_path, 'ITE311-MAGALLANO/') === 0) {
+                            $clean_path = substr($clean_path, strlen('ITE311-MAGALLANO/'));
+                        }
+                    }
+                    ?>
                     <p><strong>File:</strong> 
-                        <a href="<?= base_url($submission->file_path) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <a href="<?= base_url($clean_path) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-download"></i> <?= $submission->file_name ?>
                         </a>
                     </p>

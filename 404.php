@@ -47,15 +47,9 @@
         }
         
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-20px);
-            }
-            60% {
-                transform: translateY(-10px);
-            }
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
         }
         
         .error-title {
@@ -67,8 +61,34 @@
         .error-message {
             font-size: 16px;
             color: #666;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             line-height: 1.6;
+        }
+        
+        .requested-url {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .requested-url label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .requested-url code {
+            display: block;
+            margin-top: 5px;
+            background: #e9ecef;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-family: monospace;
+            color: #e74c3c;
+            word-break: break-all;
         }
         
         .btn-home {
@@ -107,12 +127,33 @@
         }
         
         .suggestions li {
-            margin: 5px 0;
+            margin: 8px 0;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
         
         .suggestions li i {
             color: #667eea;
             margin-right: 8px;
+        }
+        
+        .correct-url {
+            margin-top: 20px;
+            padding: 15px;
+            background: #d4edda;
+            border: 1px solid #28a745;
+            border-radius: 10px;
+        }
+        
+        .correct-url p {
+            color: #155724;
+            font-size: 14px;
+        }
+        
+        .correct-url a {
+            color: #155724;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -125,18 +166,29 @@
         <h1 class="error-title">Oops! Page Not Found</h1>
         <p class="error-message">
             Ang page na hinahanap mo ay hindi mahanap. 
-            Baka na-delete na, nabago ang pangalan, o temporarily unavailable.
+            Baka mali ang na-type na URL o wala na ang page.
         </p>
-        <a href="<?php echo base_url(); ?>" class="btn-home">
-            <i class="fas fa-home"></i> Bumalik sa Home
+        
+        <div class="requested-url">
+            <label>Hiniling na URL:</label>
+            <code><?php echo htmlspecialchars($_SERVER['REQUEST_URI'] ?? '/unknown'); ?></code>
+        </div>
+        
+        <div class="correct-url">
+            <p><i class="fas fa-lightbulb"></i> Baka ito ang hinahanap mo?</p>
+            <p><a href="/ITE311-MAGALLANO/">http://localhost/ITE311-MAGALLANO/</a></p>
+        </div>
+        
+        <a href="/ITE311-MAGALLANO/" class="btn-home">
+            <i class="fas fa-home"></i> Pumunta sa Tamang Site
         </a>
         
         <div class="suggestions">
-            <h4>Mga Posibleng Dahilan:</h4>
+            <h4><i class="fas fa-info-circle"></i> Mga Posibleng Dahilan:</h4>
             <ul>
-                <li><i class="fas fa-check"></i> Mali ang na-type na URL</li>
-                <li><i class="fas fa-check"></i> Ang page ay inalis o inilipat</li>
-                <li><i class="fas fa-check"></i> Expired na ang link</li>
+                <li><i class="fas fa-keyboard"></i> Typo sa URL (hal. MAGA instead of MAGALLANO)</li>
+                <li><i class="fas fa-folder-minus"></i> Ang folder ay inalis o pinalitan ng pangalan</li>
+                <li><i class="fas fa-link"></i> Expired o broken link</li>
             </ul>
         </div>
     </div>

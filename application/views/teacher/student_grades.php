@@ -259,8 +259,20 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Populate modal fields
             document.getElementById('assignmentTitle').textContent = assignmentTitle;
+            
+            // Fix file path - remove full Windows path if present
+            let cleanPath = filePath;
+            if (filePath.includes('htdocs')) {
+                cleanPath = filePath.split('htdocs')[1].replace(/\\/g, '/');
+                if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
+            }
+            // Remove project folder prefix if already in base_url
+            if (cleanPath.startsWith('ITE311-MAGALLANO/')) {
+                cleanPath = cleanPath.replace('ITE311-MAGALLANO/', '');
+            }
+            
             document.getElementById('submittedFile').innerHTML = 
-                '<a href="<?= base_url() ?>' + filePath + '" target="_blank"><i class="bi bi-file-earmark"></i> ' + fileName + '</a>';
+                '<a href="<?= base_url() ?>' + cleanPath + '" target="_blank"><i class="bi bi-file-earmark"></i> ' + fileName + '</a>';
             document.getElementById('scoreInput').value = score || '';
             document.getElementById('scoreInput').max = maxPoints;
             document.getElementById('maxPointsText').textContent = 'Maximum points: ' + maxPoints;

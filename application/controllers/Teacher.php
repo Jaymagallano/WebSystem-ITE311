@@ -708,7 +708,7 @@ class Teacher extends CI_Controller {
                     'title' => $this->input->post('title'),
                     'description' => $this->input->post('description'),
                     'file_name' => $upload_data['file_name'],
-                    'file_path' => $upload_data['full_path'],
+                    'file_path' => 'uploads/materials/' . $upload_data['file_name'],
                     'file_type' => $upload_data['file_type'],
                     'course_id' => $course_id,
                     'created_at' => date('Y-m-d H:i:s')
