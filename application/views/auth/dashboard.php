@@ -1,13 +1,13 @@
 <?php $this->load->view('templates/header', ['page_title' => 'Dashboard']); ?>
 
-<?php if($this->session->flashdata('success')): ?>
+<?php if ($this->session->flashdata('success')): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="bi bi-check-circle"></i> <?= $this->session->flashdata('success') ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
 
-<?php if($this->session->flashdata('error')): ?>
+<?php if ($this->session->flashdata('error')): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="bi bi-exclamation-triangle"></i> <?= $this->session->flashdata('error') ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -33,7 +33,7 @@
     </div>
 </div>
 
-<?php if($user['role'] == 'admin'): ?>
+<?php if ($user['role'] == 'admin'): ?>
     <!-- Admin Dashboard -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
@@ -51,7 +51,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3 mb-3">
             <div class="card stat-card admin">
                 <div class="card-body">
@@ -67,7 +67,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3 mb-3">
             <div class="card stat-card teacher">
                 <div class="card-body">
@@ -83,7 +83,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3 mb-3">
             <div class="card stat-card student">
                 <div class="card-body">
@@ -100,7 +100,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Recent Users Table -->
     <div class="row">
         <div class="col-12">
@@ -121,19 +121,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if(isset($recent_users) && count($recent_users) > 0): ?>
-                                    <?php foreach($recent_users as $user_item): ?>
+                                <?php if (isset($recent_users) && count($recent_users) > 0): ?>
+                                    <?php foreach ($recent_users as $user_item): ?>
                                         <tr>
                                             <td><?= $user_item->id ?></td>
                                             <td><?= $user_item->name ?></td>
                                             <td><?= $user_item->email ?></td>
                                             <td>
-                                                <?php if($user_item->role == 'admin'): ?>
-                                                    <span class="badge" style="background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);">Admin</span>
-                                                <?php elseif($user_item->role == 'teacher'): ?>
-                                                    <span class="badge" style="background: linear-gradient(135deg, #2c7a7b 0%, #285e61 100%);">Teacher</span>
+                                                <?php if ($user_item->role == 'admin'): ?>
+                                                    <span class="badge"
+                                                        style="background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);">Admin</span>
+                                                <?php elseif ($user_item->role == 'teacher'): ?>
+                                                    <span class="badge"
+                                                        style="background: linear-gradient(135deg, #2c7a7b 0%, #285e61 100%);">Teacher</span>
                                                 <?php else: ?>
-                                                    <span class="badge" style="background: linear-gradient(135deg, #2f855a 0%, #276749 100%);">Student</span>
+                                                    <span class="badge"
+                                                        style="background: linear-gradient(135deg, #2f855a 0%, #276749 100%);">Student</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td><?= date('M d, Y', strtotime($user_item->created_at)) ?></td>
@@ -151,14 +154,15 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Admin Quick Actions -->
     <div class="row mt-4">
         <div class="col-md-4 mb-3">
             <div class="card">
                 <div class="card-body text-center p-4">
                     <div class="mb-3">
-                        <i class="bi bi-person-plus-fill" style="font-size: 3.5rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                        <i class="bi bi-person-plus-fill"
+                            style="font-size: 3.5rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
                     </div>
                     <h5 class="fw-bold mb-2">Add New User</h5>
                     <p class="text-muted mb-3">Create a new user account</p>
@@ -172,7 +176,8 @@
             <div class="card">
                 <div class="card-body text-center p-4">
                     <div class="mb-3">
-                        <i class="bi bi-book-fill" style="font-size: 3.5rem; background: var(--warning-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                        <i class="bi bi-book-fill"
+                            style="font-size: 3.5rem; background: var(--warning-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
                     </div>
                     <h5 class="fw-bold mb-2">Manage Courses</h5>
                     <p class="text-muted mb-3">View and edit all courses</p>
@@ -186,7 +191,8 @@
             <div class="card">
                 <div class="card-body text-center p-4">
                     <div class="mb-3">
-                        <i class="bi bi-bar-chart-fill" style="font-size: 3.5rem; background: var(--secondary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                        <i class="bi bi-bar-chart-fill"
+                            style="font-size: 3.5rem; background: var(--secondary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
                     </div>
                     <h5 class="fw-bold mb-2">System Reports</h5>
                     <p class="text-muted mb-3">Generate system reports</p>
@@ -198,7 +204,7 @@
         </div>
     </div>
 
-<?php elseif($user['role'] == 'teacher'): ?>
+<?php elseif ($user['role'] == 'teacher'): ?>
     <!-- Teacher Dashboard -->
     <div class="row mb-4">
         <div class="col-md-4 mb-3">
@@ -217,7 +223,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4 mb-3">
             <div class="card stat-card teacher">
                 <div class="card-body">
@@ -234,7 +240,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4 mb-3">
             <div class="card stat-card users">
                 <div class="card-body">
@@ -252,7 +258,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Recent Students -->
     <div class="row">
         <div class="col-md-8">
@@ -272,8 +278,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if(isset($recent_students) && count($recent_students) > 0): ?>
-                                    <?php foreach($recent_students as $student): ?>
+                                <?php if (isset($recent_students) && count($recent_students) > 0): ?>
+                                    <?php foreach ($recent_students as $student): ?>
                                         <tr>
                                             <td><?= $student->id ?></td>
                                             <td><?= $student->name ?></td>
@@ -292,15 +298,17 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header border-0" style="background: var(--primary-gradient); color: white; border-radius: 20px 20px 0 0;">
+                <div class="card-header border-0"
+                    style="background: var(--primary-gradient); color: white; border-radius: 0px;">
                     <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill me-2"></i>Quick Actions</h5>
                 </div>
                 <div class="card-body p-4">
                     <div class="d-grid gap-3">
-                        <a href="<?= base_url('teacher/create_course') ?>" class="btn btn-outline-primary btn-lg text-start">
+                        <a href="<?= base_url('teacher/create_course') ?>"
+                            class="btn btn-outline-primary btn-lg text-start">
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-plus-circle-fill me-3" style="font-size: 1.5rem;"></i>
                                 <div>
@@ -309,7 +317,8 @@
                                 </div>
                             </div>
                         </a>
-                        <a href="<?= base_url('teacher/create_assignment') ?>" class="btn btn-outline-success btn-lg text-start">
+                        <a href="<?= base_url('teacher/create_assignment') ?>"
+                            class="btn btn-outline-success btn-lg text-start">
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-clipboard-plus-fill me-3" style="font-size: 1.5rem;"></i>
                                 <div>
@@ -361,14 +370,15 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4 mb-3">
             <div class="card stat-card student">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-muted mb-2 fw-semibold">Enrolled Courses</h6>
-                            <h3 class="mb-0 fw-bold"><?= isset($total_enrolled_courses) ? $total_enrolled_courses : 0 ?></h3>
+                            <h3 class="mb-0 fw-bold"><?= isset($total_enrolled_courses) ? $total_enrolled_courses : 0 ?>
+                            </h3>
                             <small class="text-success"><i class="bi bi-bookmark-check"></i> Active learning</small>
                         </div>
                         <div class="text-success" style="font-size: 2.5rem; color: #2f855a !important;">
@@ -378,14 +388,15 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4 mb-3">
             <div class="card stat-card users">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-muted mb-2 fw-semibold">Pending Tasks</h6>
-                            <h3 class="mb-0 fw-bold"><?= isset($total_pending_assignments) ? $total_pending_assignments : 0 ?></h3>
+                            <h3 class="mb-0 fw-bold">
+                                <?= isset($total_pending_assignments) ? $total_pending_assignments : 0 ?></h3>
                             <small class="text-primary"><i class="bi bi-clock"></i> To complete</small>
                         </div>
                         <div class="text-primary" style="font-size: 2.5rem; color: #3182ce !important;">
@@ -396,7 +407,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row">
         <div class="col-md-8">
             <div class="card mb-3">
@@ -408,7 +419,7 @@
                     <a href="#" class="btn btn-primary">Browse Courses</a>
                 </div>
             </div>
-            
+
             <div class="card">
                 <div class="card-header bg-white">
                     <h5 class="mb-0"><i class="bi bi-clipboard-check"></i> Upcoming Assignments</h5>
@@ -418,7 +429,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4">
             <div class="card mb-3">
                 <div class="card-header bg-white">
@@ -428,7 +439,7 @@
                     <p class="text-muted">No classes scheduled for today.</p>
                 </div>
             </div>
-            
+
             <div class="card">
                 <div class="card-header bg-white">
                     <h5 class="mb-0"><i class="bi bi-bar-chart"></i> My Performance</h5>

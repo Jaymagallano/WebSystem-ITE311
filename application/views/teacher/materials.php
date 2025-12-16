@@ -1,13 +1,13 @@
 <?php $this->load->view('templates/header', ['page_title' => 'Course Materials']); ?>
 
-<?php if($this->session->flashdata('success')): ?>
+<?php if ($this->session->flashdata('success')): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="bi bi-check-circle"></i> <?= $this->session->flashdata('success') ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
 
-<?php if($this->session->flashdata('error')): ?>
+<?php if ($this->session->flashdata('error')): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="bi bi-exclamation-triangle"></i> <?= $this->session->flashdata('error') ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -18,8 +18,9 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
             <h2><i class="bi bi-file-earmark-text"></i> Course Materials</h2>
-            <?php if(isset($selected_course)): ?>
-                <a href="<?= base_url('teacher/upload_material') ?>?course_id=<?= $selected_course->id ?>" class="btn btn-primary">
+            <?php if (isset($selected_course)): ?>
+                <a href="<?= base_url('teacher/upload_material') ?>?course_id=<?= $selected_course->id ?>"
+                    class="btn btn-primary">
                     <i class="bi bi-cloud-upload"></i> Upload Material
                 </a>
             <?php endif; ?>
@@ -27,13 +28,13 @@
     </div>
 </div>
 
-<?php if(isset($courses) && count($courses) > 0): ?>
+<?php if (isset($courses) && count($courses) > 0): ?>
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="courseFilter" class="form-label">Select Course:</label>
             <select class="form-select" id="courseFilter">
                 <option value="">Choose a course...</option>
-                <?php foreach($courses as $course): ?>
+                <?php foreach ($courses as $course): ?>
                     <option value="<?= $course->id ?>" <?= ($course_filter ?? '') == $course->id ? 'selected' : '' ?>>
                         <?= $course->code ?> - <?= $course->title ?>
                     </option>
@@ -43,18 +44,19 @@
     </div>
 <?php endif; ?>
 
-<?php if(isset($selected_course)): ?>
+<?php if (isset($selected_course)): ?>
     <div class="row" id="materialsTableContainer">
         <div class="col-12">
             <div class="card">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0" id="courseTitle"><?= $selected_course->title ?> - Materials</h5>
-                    <a href="<?= base_url('teacher/upload_material') ?>?course_id=<?= $selected_course->id ?>" class="btn btn-sm btn-primary" id="uploadBtn">
+                    <a href="<?= base_url('teacher/upload_material') ?>?course_id=<?= $selected_course->id ?>"
+                        class="btn btn-sm btn-primary" id="uploadBtn">
                         <i class="bi bi-cloud-upload"></i> Upload Material
                     </a>
                 </div>
                 <div class="card-body">
-                    <?php if(isset($materials) && count($materials) > 0): ?>
+                    <?php if (isset($materials) && count($materials) > 0): ?>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -66,25 +68,27 @@
                                     </tr>
                                 </thead>
                                 <tbody id="materialsTableBody">
-                                    <?php foreach($materials as $material): ?>
+                                    <?php foreach ($materials as $material): ?>
                                         <tr>
                                             <td>
                                                 <i class="bi bi-file-earmark"></i> <strong><?= $material->title ?></strong>
-                                                <?php if($material->description): ?>
+                                                <?php if ($material->description): ?>
                                                     <br><small class="text-muted"><?= $material->description ?></small>
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <span class="badge bg-secondary"><?= strtoupper(str_replace('.', '', $material->file_type)) ?></span>
+                                                <span
+                                                    class="badge bg-secondary"><?= strtoupper(str_replace('.', '', $material->file_type)) ?></span>
                                             </td>
                                             <td><?= date('M d, Y', strtotime($material->created_at)) ?></td>
-                                                                                        <td>
-                                                <a href="<?= base_url('uploads/materials/'.$material->file_name) ?>" class="btn btn-sm btn-outline-primary" download>
+                                            <td>
+                                                <a href="<?= base_url('uploads/materials/' . $material->file_name) ?>"
+                                                    class="btn btn-sm btn-outline-primary" download>
                                                     <i class="bi bi-download"></i> Download
                                                 </a>
-                                                <button type="button" class="btn btn-sm btn-outline-danger delete-material-btn" 
-                                                        data-material-id="<?= $material->id ?>"
-                                                        data-material-title="<?= htmlspecialchars($material->title) ?>">
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-material-btn"
+                                                    data-material-id="<?= $material->id ?>"
+                                                    data-material-title="<?= htmlspecialchars($material->title) ?>">
                                                     <i class="bi bi-trash"></i> Delete
                                                 </button>
                                             </td>
@@ -97,7 +101,8 @@
                         <div class="text-center py-4">
                             <i class="bi bi-file-earmark-x" style="font-size: 3rem; color: #ccc;"></i>
                             <p class="mt-2 text-muted">No materials uploaded for this course yet.</p>
-                            <a href="<?= base_url('teacher/upload_material') ?>?course_id=<?= $selected_course->id ?>" class="btn btn-primary">
+                            <a href="<?= base_url('teacher/upload_material') ?>?course_id=<?= $selected_course->id ?>"
+                                class="btn btn-primary">
                                 <i class="bi bi-cloud-upload"></i> Upload First Material
                             </a>
                         </div>
@@ -146,18 +151,18 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Course filter change handler with AJAX
-    const courseFilter = document.getElementById('courseFilter');
-    const materialsTableContainer = document.getElementById('materialsTableContainer');
-    
-    if (courseFilter) {
-        courseFilter.addEventListener('change', function() {
-            const courseId = this.value;
-            
-            if (!courseId) {
-                // Show empty state
-                materialsTableContainer.innerHTML = `
+    document.addEventListener('DOMContentLoaded', function () {
+        // Course filter change handler with AJAX
+        const courseFilter = document.getElementById('courseFilter');
+        const materialsTableContainer = document.getElementById('materialsTableContainer');
+
+        if (courseFilter) {
+            courseFilter.addEventListener('change', function () {
+                const courseId = this.value;
+
+                if (!courseId) {
+                    // Show empty state
+                    materialsTableContainer.innerHTML = `
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body text-center py-5">
@@ -168,13 +173,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                 `;
-                // Update URL
-                window.history.pushState({}, '', '<?= base_url('teacher/materials') ?>');
-                return;
-            }
-            
-            // Show loading state
-            materialsTableContainer.innerHTML = `
+                    // Update URL
+                    window.history.pushState({}, '', '<?= base_url('teacher/materials') ?>');
+                    return;
+                }
+
+                // Show loading state
+                materialsTableContainer.innerHTML = `
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body text-center py-5">
@@ -186,23 +191,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             `;
-            
-            // Perform AJAX request
-            const formData = new FormData();
-            formData.append('course_id', courseId);
-            
-            fetch('<?= base_url('teacher/materials_ajax') ?>', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update table
-                    materialsTableContainer.innerHTML = `
+
+                // Perform AJAX request
+                const formData = new FormData();
+                formData.append('course_id', courseId);
+                formData.append(window.csrf_token_name, window.csrf_hash);
+
+                fetch('<?= base_url('teacher/materials_ajax') ?>', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update table
+                            materialsTableContainer.innerHTML = `
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -232,23 +238,23 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                     `;
-                    
-                    // Update URL without reload
-                    window.history.pushState({}, '', '<?= base_url('teacher/materials?course_id=') ?>' + courseId);
-                    
-                    // Add fade-in animation
-                    materialsTableContainer.style.opacity = '0';
-                    setTimeout(() => {
-                        materialsTableContainer.style.transition = 'opacity 0.3s';
-                        materialsTableContainer.style.opacity = '1';
-                    }, 10);
-                } else {
-                    alert('Error loading materials: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                materialsTableContainer.innerHTML = `
+
+                            // Update URL without reload
+                            window.history.pushState({}, '', '<?= base_url('teacher/materials?course_id=') ?>' + courseId);
+
+                            // Add fade-in animation
+                            materialsTableContainer.style.opacity = '0';
+                            setTimeout(() => {
+                                materialsTableContainer.style.transition = 'opacity 0.3s';
+                                materialsTableContainer.style.opacity = '1';
+                            }, 10);
+                        } else {
+                            alert('Error loading materials: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        materialsTableContainer.innerHTML = `
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body text-center py-5">
@@ -259,43 +265,43 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                 `;
+                    });
+            });
+        }
+
+        // Delete modal code
+        const deleteMaterialButtons = document.querySelectorAll('.delete-material-btn');
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        const deleteForm = document.getElementById('deleteForm');
+
+        deleteMaterialButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const materialId = this.dataset.materialId;
+                const materialTitle = this.dataset.materialTitle;
+
+                console.log('Delete button clicked for material ID:', materialId);
+
+                // Update modal content
+                document.getElementById('materialTitle').textContent = materialTitle;
+
+                // Update form action
+                deleteForm.action = '<?= base_url('teacher/delete_material/') ?>' + materialId;
+
+                console.log('Form action set to:', deleteForm.action);
+
+                // Show modal
+                deleteModal.show();
             });
         });
-    }
-    
-    // Delete modal code
-    const deleteMaterialButtons = document.querySelectorAll('.delete-material-btn');
-    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    const deleteForm = document.getElementById('deleteForm');
-    
-    deleteMaterialButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const materialId = this.dataset.materialId;
-            const materialTitle = this.dataset.materialTitle;
-            
-            console.log('Delete button clicked for material ID:', materialId);
-            
-            // Update modal content
-            document.getElementById('materialTitle').textContent = materialTitle;
-            
-            // Update form action
-            deleteForm.action = '<?= base_url('teacher/delete_material/') ?>' + materialId;
-            
-            console.log('Form action set to:', deleteForm.action);
-            
-            // Show modal
-            deleteModal.show();
+
+        // Add form submit handler for debugging
+        deleteForm.addEventListener('submit', function (e) {
+            console.log('Form submitting to:', this.action);
         });
     });
-    
-    // Add form submit handler for debugging
-    deleteForm.addEventListener('submit', function(e) {
-        console.log('Form submitting to:', this.action);
-    });
-});
 </script>
 
 <?php $this->load->view('templates/footer'); ?>

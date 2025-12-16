@@ -6,13 +6,13 @@
     </div>
 </div>
 
-<?php if(isset($courses) && count($courses) > 0): ?>
+<?php if (isset($courses) && count($courses) > 0): ?>
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="courseFilter" class="form-label">Select Course:</label>
             <select class="form-select" id="courseFilter">
                 <option value="">Choose a course...</option>
-                <?php foreach($courses as $course): ?>
+                <?php foreach ($courses as $course): ?>
                     <option value="<?= $course->id ?>" <?= ($course_filter ?? '') == $course->id ? 'selected' : '' ?>>
                         <?= $course->code ?> - <?= $course->title ?>
                     </option>
@@ -22,7 +22,7 @@
     </div>
 <?php endif; ?>
 
-<?php if(isset($selected_course)): ?>
+<?php if (isset($selected_course)): ?>
     <div class="row" id="gradesTableContainer">
         <div class="col-12">
             <div class="card">
@@ -41,23 +41,23 @@
                                 </tr>
                             </thead>
                             <tbody id="gradesTableBody">
-                                <?php if(isset($students) && count($students) > 0): ?>
-                                    <?php foreach($students as $student): ?>
+                                <?php if (isset($students) && count($students) > 0): ?>
+                                    <?php foreach ($students as $student): ?>
                                         <tr>
                                             <td><i class="bi bi-person-circle"></i> <?= $student->name ?></td>
                                             <td><?= $student->email ?></td>
                                             <td>
                                                 <?php if ($student->average_grade !== null): ?>
-                                                    <?php 
-                                                        $grade = $student->average_grade;
-                                                        $badge_class = 'bg-success';
-                                                        if ($grade < 60) {
-                                                            $badge_class = 'bg-danger';
-                                                        } elseif ($grade < 75) {
-                                                            $badge_class = 'bg-warning';
-                                                        } elseif ($grade < 85) {
-                                                            $badge_class = 'bg-info';
-                                                        }
+                                                    <?php
+                                                    $grade = $student->average_grade;
+                                                    $badge_class = 'bg-success';
+                                                    if ($grade < 60) {
+                                                        $badge_class = 'bg-danger';
+                                                    } elseif ($grade < 75) {
+                                                        $badge_class = 'bg-warning';
+                                                    } elseif ($grade < 85) {
+                                                        $badge_class = 'bg-info';
+                                                    }
                                                     ?>
                                                     <span class="badge <?= $badge_class ?>"><?= number_format($grade, 2) ?>%</span>
                                                 <?php else: ?>
@@ -65,7 +65,8 @@
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <a href="<?= base_url('teacher/student_grades/' . $selected_course->id . '/' . $student->id) ?>" class="btn btn-sm btn-outline-primary">
+                                                <a href="<?= base_url('teacher/student_grades/' . $selected_course->id . '/' . $student->id) ?>"
+                                                    class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-eye"></i> View Details
                                                 </a>
                                             </td>
@@ -98,17 +99,17 @@
 <?php endif; ?>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const courseFilter = document.getElementById('courseFilter');
-    const gradesTableContainer = document.getElementById('gradesTableContainer');
-    
-    if (courseFilter) {
-        courseFilter.addEventListener('change', function() {
-            const courseId = this.value;
-            
-            if (!courseId) {
-                // Show empty state
-                gradesTableContainer.innerHTML = `
+    document.addEventListener('DOMContentLoaded', function () {
+        const courseFilter = document.getElementById('courseFilter');
+        const gradesTableContainer = document.getElementById('gradesTableContainer');
+
+        if (courseFilter) {
+            courseFilter.addEventListener('change', function () {
+                const courseId = this.value;
+
+                if (!courseId) {
+                    // Show empty state
+                    gradesTableContainer.innerHTML = `
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body text-center py-5">
@@ -119,13 +120,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                 `;
-                // Update URL
-                window.history.pushState({}, '', '<?= base_url('teacher/grades') ?>');
-                return;
-            }
-            
-            // Show loading state
-            gradesTableContainer.innerHTML = `
+                    // Update URL
+                    window.history.pushState({}, '', '<?= base_url('teacher/grades') ?>');
+                    return;
+                }
+
+                // Show loading state
+                gradesTableContainer.innerHTML = `
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body text-center py-5">
@@ -137,23 +138,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             `;
-            
-            // Perform AJAX request
-            const formData = new FormData();
-            formData.append('course_id', courseId);
-            
-            fetch('<?= base_url('teacher/grades_ajax') ?>', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+
+                // Perform AJAX request
+                const formData = new FormData();
+                formData.append('course_id', courseId);
+                if (window.csrf_token_name) {
+                    formData.append(window.csrf_token_name, window.csrf_hash);
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update table
-                    gradesTableContainer.innerHTML = `
+
+                fetch('<?= base_url('teacher/grades_ajax') ?>', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update table
+                            gradesTableContainer.innerHTML = `
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header bg-white">
@@ -179,23 +183,23 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                     `;
-                    
-                    // Update URL without reload
-                    window.history.pushState({}, '', '<?= base_url('teacher/grades?course_id=') ?>' + courseId);
-                    
-                    // Add fade-in animation
-                    gradesTableContainer.style.opacity = '0';
-                    setTimeout(() => {
-                        gradesTableContainer.style.transition = 'opacity 0.3s';
-                        gradesTableContainer.style.opacity = '1';
-                    }, 10);
-                } else {
-                    alert('Error loading grades: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                gradesTableContainer.innerHTML = `
+
+                            // Update URL without reload
+                            window.history.pushState({}, '', '<?= base_url('teacher/grades?course_id=') ?>' + courseId);
+
+                            // Add fade-in animation
+                            gradesTableContainer.style.opacity = '0';
+                            setTimeout(() => {
+                                gradesTableContainer.style.transition = 'opacity 0.3s';
+                                gradesTableContainer.style.opacity = '1';
+                            }, 10);
+                        } else {
+                            alert('Error loading grades: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        gradesTableContainer.innerHTML = `
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body text-center py-5">
@@ -206,10 +210,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                 `;
+                    });
             });
-        });
-    }
-});
+        }
+    });
 </script>
 
 <?php $this->load->view('templates/footer'); ?>

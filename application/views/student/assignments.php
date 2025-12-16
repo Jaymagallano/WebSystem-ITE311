@@ -1,6 +1,6 @@
 <?php $this->load->view('templates/header', ['page_title' => 'Assignments']); ?>
 
-<?php if($this->session->flashdata('success')): ?>
+<?php if ($this->session->flashdata('success')): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="bi bi-check-circle"></i> <?= $this->session->flashdata('success') ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -45,8 +45,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if(isset($assignments) && count($assignments) > 0): ?>
-                                <?php foreach($assignments as $assignment): ?>
+                            <?php if (isset($assignments) && count($assignments) > 0): ?>
+                                <?php foreach ($assignments as $assignment): ?>
                                     <?php
                                     $due_date = strtotime($assignment->due_date);
                                     $is_overdue = $due_date < time();
@@ -56,33 +56,38 @@
                                     <tr class="assignment-row">
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <div class="assignment-icon me-3" style="width: 40px; height: 40px; background: <?= $is_submitted ? 'var(--success-gradient)' : 'var(--warning-gradient)' ?>; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
-                                                    <i class="bi bi-<?= $is_submitted ? 'check-circle-fill' : 'clock-fill' ?>"></i>
+                                                <div class="assignment-icon me-3"
+                                                    style="width: 40px; height: 40px; background: <?= $is_submitted ? 'var(--success-gradient)' : 'var(--warning-gradient)' ?>; border-radius: 0px; display: flex; align-items: center; justify-content: center; color: white;">
+                                                    <i
+                                                        class="bi bi-<?= $is_submitted ? 'check-circle-fill' : 'clock-fill' ?>"></i>
                                                 </div>
                                                 <div>
                                                     <strong class="fw-semibold"><?= $assignment->title ?></strong>
-                                                    <br><small class="text-muted"><?= substr($assignment->description, 0, 60) ?>...</small>
+                                                    <br><small
+                                                        class="text-muted"><?= substr($assignment->description, 0, 60) ?>...</small>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div>
-                                                <span class="badge" style="background: var(--primary-gradient); color: white;"><?= $assignment->course_code ?></span>
+                                                <span class="badge"
+                                                    style="background: var(--primary-gradient); color: white;"><?= $assignment->course_code ?></span>
                                                 <div class="mt-1 fw-medium"><?= $assignment->course_title ?></div>
                                             </div>
                                         </td>
                                         <td>
-                                            <?php 
+                                            <?php
                                             $days_left = ceil(($due_date - time()) / (60 * 60 * 24));
                                             ?>
-                                            <div class="<?= $is_overdue && !$is_submitted ? 'text-danger' : ($days_left <= 3 && !$is_submitted ? 'text-warning' : 'text-success') ?>">
+                                            <div
+                                                class="<?= $is_overdue && !$is_submitted ? 'text-danger' : ($days_left <= 3 && !$is_submitted ? 'text-warning' : 'text-success') ?>">
                                                 <i class="bi bi-calendar-event"></i> <?= date('M d, Y', $due_date) ?>
                                                 <br><small class="fw-medium">
-                                                    <?php if($is_overdue && !$is_submitted): ?>
+                                                    <?php if ($is_overdue && !$is_submitted): ?>
                                                         <i class="bi bi-exclamation-triangle"></i> Overdue
-                                                    <?php elseif($days_left <= 3 && !$is_submitted): ?>
+                                                    <?php elseif ($days_left <= 3 && !$is_submitted): ?>
                                                         <i class="bi bi-clock"></i> <?= $days_left ?> days left
-                                                    <?php elseif($is_submitted): ?>
+                                                    <?php elseif ($is_submitted): ?>
                                                         <i class="bi bi-check-circle"></i> Submitted
                                                     <?php else: ?>
                                                         <i class="bi bi-calendar-check"></i> On time
@@ -92,31 +97,38 @@
                                         </td>
                                         <td>
                                             <div class="text-center">
-                                                <span class="badge bg-warning text-dark fs-6 px-3 py-2"><?= $assignment->max_points ?> pts</span>
+                                                <span
+                                                    class="badge bg-warning text-dark fs-6 px-3 py-2"><?= $assignment->max_points ?>
+                                                    pts</span>
                                             </div>
                                         </td>
                                         <td>
-                                            <?php if($is_submitted): ?>
-                                                <span class="badge" style="background: var(--success-gradient); color: white; padding: 8px 12px;">
+                                            <?php if ($is_submitted): ?>
+                                                <span class="badge"
+                                                    style="background: var(--success-gradient); color: white; padding: 8px 12px;">
                                                     <i class="bi bi-check-circle-fill me-1"></i>Submitted
                                                 </span>
-                                                <?php if($assignment->submitted_at): ?>
-                                                    <br><small class="text-muted"><?= date('M d, Y', strtotime($assignment->submitted_at)) ?></small>
+                                                <?php if ($assignment->submitted_at): ?>
+                                                    <br><small
+                                                        class="text-muted"><?= date('M d, Y', strtotime($assignment->submitted_at)) ?></small>
                                                 <?php endif; ?>
                                             <?php else: ?>
-                                                <span class="badge" style="background: var(--warning-gradient); color: white; padding: 8px 12px;">
+                                                <span class="badge"
+                                                    style="background: var(--warning-gradient); color: white; padding: 8px 12px;">
                                                     <i class="bi bi-clock-fill me-1"></i>Pending
                                                 </span>
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <?php if($is_graded): ?>
-                                                <?php 
+                                            <?php if ($is_graded): ?>
+                                                <?php
                                                 $percentage = ($assignment->score / $assignment->max_points) * 100;
                                                 $grade_color = $percentage >= 80 ? 'success' : ($percentage >= 60 ? 'warning' : 'danger');
                                                 ?>
                                                 <div class="text-center">
-                                                    <span class="badge bg-<?= $grade_color ?> fs-6 px-3 py-2"><?= $assignment->score ?> / <?= $assignment->max_points ?></span>
+                                                    <span
+                                                        class="badge bg-<?= $grade_color ?> fs-6 px-3 py-2"><?= $assignment->score ?>
+                                                        / <?= $assignment->max_points ?></span>
                                                     <br><small class="text-<?= $grade_color ?>"><?= round($percentage) ?>%</small>
                                                 </div>
                                             <?php else: ?>
@@ -127,8 +139,9 @@
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <?php if(!$is_submitted): ?>
-                                                <a href="<?= base_url('student/submit_assignment/'.$assignment->id) ?>" class="btn btn-primary btn-sm px-3">
+                                            <?php if (!$is_submitted): ?>
+                                                <a href="<?= base_url('student/submit_assignment/' . $assignment->id) ?>"
+                                                    class="btn btn-primary btn-sm px-3">
                                                     <i class="bi bi-upload me-1"></i>Submit
                                                 </a>
                                             <?php else: ?>
@@ -144,9 +157,11 @@
                                 <tr>
                                     <td colspan="7" class="text-center py-5">
                                         <div class="empty-state">
-                                            <i class="bi bi-clipboard-heart pulse" style="font-size: 4rem; background: var(--secondary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                                            <i class="bi bi-clipboard-heart pulse"
+                                                style="font-size: 4rem; background: var(--secondary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
                                             <h5 class="mt-3 fw-bold">All Caught Up! 🎉</h5>
-                                            <p class="text-muted mb-3">No assignments available right now. Check back later for new tasks!</p>
+                                            <p class="text-muted mb-3">No assignments available right now. Check back later
+                                                for new tasks!</p>
                                             <button class="btn btn-outline-primary" onclick="window.location.reload()">
                                                 <i class="bi bi-arrow-clockwise me-2"></i>Refresh
                                             </button>

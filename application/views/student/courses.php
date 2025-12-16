@@ -1,13 +1,13 @@
 <?php $this->load->view('templates/header', ['page_title' => 'My Courses']); ?>
 
-<?php if($this->session->flashdata('success')): ?>
+<?php if ($this->session->flashdata('success')): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="bi bi-check-circle"></i> <?= $this->session->flashdata('success') ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
 
-<?php if($this->session->flashdata('error')): ?>
+<?php if ($this->session->flashdata('error')): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="bi bi-exclamation-triangle"></i> <?= $this->session->flashdata('error') ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -38,7 +38,8 @@
 <div class="row mb-4">
     <div class="col-12">
         <div class="d-flex align-items-center mb-4">
-            <div class="section-icon me-3" style="width: 50px; height: 50px; background: var(--success-gradient); border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white;">
+            <div class="section-icon me-3"
+                style="width: 50px; height: 50px; background: var(--success-gradient); border-radius: 0px; display: flex; align-items: center; justify-content: center; color: white;">
                 <i class="bi bi-bookmark-check-fill"></i>
             </div>
             <div>
@@ -47,12 +48,14 @@
             </div>
         </div>
     </div>
-    
-    <?php if(isset($enrolled_courses) && count($enrolled_courses) > 0): ?>
-        <?php foreach($enrolled_courses as $course): ?>
+
+    <?php if (isset($enrolled_courses) && count($enrolled_courses) > 0): ?>
+        <?php foreach ($enrolled_courses as $course): ?>
             <div class="col-md-4 mb-4">
-                <div class="card h-100 enrolled-course" style="border: 2px solid transparent; background: linear-gradient(white, white) padding-box, var(--success-gradient) border-box;">
-                    <div class="card-header border-0" style="background: var(--success-gradient); color: white; border-radius: 18px 18px 0 0;">
+                <div class="card h-100 enrolled-course"
+                    style="border: 2px solid transparent; background: linear-gradient(white, white) padding-box, var(--success-gradient) border-box;">
+                    <div class="card-header border-0"
+                        style="background: var(--success-gradient); color: white; border-radius: 0px;">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="mb-1 fw-bold"><?= $course->title ?></h5>
@@ -83,7 +86,7 @@
                         <small class="text-muted"><i class="bi bi-graph-up me-1"></i>65% Complete</small>
                     </div>
                     <div class="card-footer bg-transparent border-0 p-4 pt-0">
-                        <a href="<?= base_url('student/course_details/'.$course->id) ?>" class="btn btn-success w-100 btn-lg">
+                        <a href="<?= base_url('student/course_details/' . $course->id) ?>" class="btn btn-success w-100 btn-lg">
                             <i class="bi bi-play-circle-fill me-2"></i>Continue Learning
                         </a>
                     </div>
@@ -92,15 +95,19 @@
         <?php endforeach; ?>
     <?php else: ?>
         <div class="col-12">
-            <div class="card border-0" style="background: linear-gradient(135deg, rgba(67, 172, 123, 0.1) 0%, rgba(56, 249, 215, 0.1) 100%);">
+            <div class="card border-0"
+                style="background: linear-gradient(135deg, rgba(67, 172, 123, 0.1) 0%, rgba(56, 249, 215, 0.1) 100%);">
                 <div class="card-body text-center py-5">
                     <div class="empty-state-icon mb-4">
-                        <i class="bi bi-bookmark-plus pulse" style="font-size: 4rem; background: var(--success-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                        <i class="bi bi-bookmark-plus pulse"
+                            style="font-size: 4rem; background: var(--success-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
                     </div>
                     <h4 class="fw-bold mb-3">Start Your Learning Adventure! 📚</h4>
-                    <p class="text-muted mb-4">You haven't enrolled in any courses yet. Browse available courses below to begin your journey.</p>
+                    <p class="text-muted mb-4">You haven't enrolled in any courses yet. Browse available courses below to
+                        begin your journey.</p>
                     <div class="d-flex justify-content-center gap-3">
-                        <button class="btn btn-success btn-lg px-4 floating" onclick="document.getElementById('available-courses').scrollIntoView({behavior: 'smooth'})">
+                        <button class="btn btn-success btn-lg px-4 floating"
+                            onclick="document.getElementById('available-courses').scrollIntoView({behavior: 'smooth'})">
                             <i class="bi bi-search me-2"></i>Browse Courses
                         </button>
                     </div>
@@ -114,7 +121,8 @@
 <div class="row" id="available-courses">
     <div class="col-12">
         <div class="d-flex align-items-center mb-4">
-            <div class="section-icon me-3" style="width: 50px; height: 50px; background: var(--primary-gradient); border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white;">
+            <div class="section-icon me-3"
+                style="width: 50px; height: 50px; background: var(--primary-gradient); border-radius: 0px; display: flex; align-items: center; justify-content: center; color: white;">
                 <i class="bi bi-collection-fill"></i>
             </div>
             <div>
@@ -123,12 +131,13 @@
             </div>
         </div>
     </div>
-    
-    <?php if(isset($available_courses) && count($available_courses) > 0): ?>
-        <?php foreach($available_courses as $course): ?>
+
+    <?php if (isset($available_courses) && count($available_courses) > 0): ?>
+        <?php foreach ($available_courses as $course): ?>
             <div class="col-md-4 mb-4">
                 <div class="card h-100 available-course">
-                    <div class="card-header border-0" style="background: var(--primary-gradient); color: white; border-radius: 20px 20px 0 0;">
+                    <div class="card-header border-0"
+                        style="background: var(--primary-gradient); color: white; border-radius: 0px;">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="mb-1 fw-bold"><?= $course->title ?></h5>
@@ -171,7 +180,8 @@
                         </div>
                     </div>
                     <div class="card-footer bg-transparent border-0 p-4 pt-0">
-                        <a href="<?= base_url('student/enroll/'.$course->id) ?>" class="btn btn-primary w-100 btn-lg enroll-btn" data-action="enroll">
+                        <a href="<?= base_url('student/enroll/' . $course->id) ?>" class="btn btn-primary w-100 btn-lg enroll-btn"
+                            data-action="enroll">
                             <i class="bi bi-plus-circle-fill me-2"></i>Enroll Now
                         </a>
                     </div>
@@ -180,13 +190,16 @@
         <?php endforeach; ?>
     <?php else: ?>
         <div class="col-12">
-            <div class="card border-0" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);">
+            <div class="card border-0"
+                style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);">
                 <div class="card-body text-center py-5">
                     <div class="empty-state-icon mb-4">
-                        <i class="bi bi-collection pulse" style="font-size: 4rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                        <i class="bi bi-collection pulse"
+                            style="font-size: 4rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
                     </div>
                     <h4 class="fw-bold mb-3">All Caught Up! 🎉</h4>
-                    <p class="text-muted mb-4">You've enrolled in all available courses or new courses will be added soon.</p>
+                    <p class="text-muted mb-4">You've enrolled in all available courses or new courses will be added soon.
+                    </p>
                     <div class="d-flex justify-content-center gap-3">
                         <button class="btn btn-outline-primary btn-lg px-4 floating" onclick="window.location.reload()">
                             <i class="bi bi-arrow-clockwise me-2"></i>Check for Updates

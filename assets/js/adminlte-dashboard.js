@@ -3,15 +3,15 @@
  * Interactive features for Admin, Teacher, and Student dashboards
  */
 
-(function($) {
+(function ($) {
     'use strict';
 
     // ============================================
     // DASHBOARD INITIALIZATION
     // ============================================
     const AdminLTEDashboard = {
-        
-        init: function() {
+
+        init: function () {
             this.initStatCards();
             this.initTooltips();
             this.initPopovers();
@@ -32,64 +32,21 @@
         // ============================================
         // STAT CARDS ANIMATION
         // ============================================
-        initStatCards: function() {
-            $('.stat-card').each(function(index) {
-                $(this).css({
-                    'opacity': '0',
-                    'transform': 'translateY(20px)'
-                });
-                
-                setTimeout(() => {
-                    $(this).css({
-                        'opacity': '1',
-                        'transform': 'translateY(0)',
-                        'transition': 'all 0.5s ease'
-                    });
-                }, index * 100);
-            });
-
-            // Add hover effect
-            $('.stat-card').hover(
-                function() {
-                    $(this).css('transform', 'translateY(-5px)');
-                },
-                function() {
-                    $(this).css('transform', 'translateY(0)');
-                }
-            );
+        initStatCards: function () {
+            // Animations disabled
         },
 
         // ============================================
         // COUNT UP ANIMATION
         // ============================================
-        initCountUp: function() {
-            $('.stat-card h3').each(function() {
-                const $this = $(this);
-                const countTo = parseInt($this.text());
-                
-                if (!isNaN(countTo)) {
-                    $this.text('0');
-                    
-                    $({ countNum: 0 }).animate({
-                        countNum: countTo
-                    }, {
-                        duration: 2000,
-                        easing: 'swing',
-                        step: function() {
-                            $this.text(Math.floor(this.countNum));
-                        },
-                        complete: function() {
-                            $this.text(countTo);
-                        }
-                    });
-                }
-            });
+        initCountUp: function () {
+            // Animations disabled
         },
 
         // ============================================
         // TOOLTIPS
         // ============================================
-        initTooltips: function() {
+        initTooltips: function () {
             if (typeof bootstrap !== 'undefined') {
                 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
                 tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -101,7 +58,7 @@
         // ============================================
         // POPOVERS
         // ============================================
-        initPopovers: function() {
+        initPopovers: function () {
             if (typeof bootstrap !== 'undefined') {
                 const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
                 popoverTriggerList.map(function (popoverTriggerEl) {
@@ -113,21 +70,21 @@
         // ============================================
         // CARD REFRESH
         // ============================================
-        initCardRefresh: function() {
-            $(document).on('click', '[data-card-widget="refresh"]', function(e) {
+        initCardRefresh: function () {
+            $(document).on('click', '[data-card-widget="refresh"]', function (e) {
                 e.preventDefault();
                 const $card = $(this).closest('.card');
                 const $icon = $(this).find('i');
-                
+
                 // Add loading state
                 $icon.addClass('fa-spin');
                 $card.css('opacity', '0.6');
-                
+
                 // Simulate refresh (replace with actual AJAX call)
                 setTimeout(() => {
                     $icon.removeClass('fa-spin');
                     $card.css('opacity', '1');
-                    
+
                     // Show success message
                     AdminLTEDashboard.showToast('Card refreshed successfully!', 'success');
                 }, 1500);
@@ -137,13 +94,13 @@
         // ============================================
         // CARD COLLAPSE
         // ============================================
-        initCardCollapse: function() {
-            $(document).on('click', '[data-card-widget="collapse"]', function(e) {
+        initCardCollapse: function () {
+            $(document).on('click', '[data-card-widget="collapse"]', function (e) {
                 e.preventDefault();
                 const $card = $(this).closest('.card');
                 const $body = $card.find('.card-body');
                 const $icon = $(this).find('i');
-                
+
                 $body.slideToggle(300);
                 $icon.toggleClass('bi-chevron-up bi-chevron-down');
             });
@@ -152,10 +109,10 @@
         // ============================================
         // SEARCH FILTER
         // ============================================
-        initSearchFilter: function() {
-            $('#tableSearch').on('keyup', function() {
+        initSearchFilter: function () {
+            $('#tableSearch').on('keyup', function () {
                 const value = $(this).val().toLowerCase();
-                $('.table tbody tr').filter(function() {
+                $('.table tbody tr').filter(function () {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
                 });
             });
@@ -164,17 +121,17 @@
         // ============================================
         // NOTIFICATIONS
         // ============================================
-        initNotifications: function() {
+        initNotifications: function () {
             // Mark notification as read
-            $(document).on('click', '.notification-item', function() {
+            $(document).on('click', '.notification-item', function () {
                 $(this).removeClass('unread');
                 $(this).find('.notification-badge').fadeOut();
             });
 
             // Clear all notifications
-            $(document).on('click', '#clearNotifications', function(e) {
+            $(document).on('click', '#clearNotifications', function (e) {
                 e.preventDefault();
-                $('.notification-item').fadeOut(300, function() {
+                $('.notification-item').fadeOut(300, function () {
                     $(this).remove();
                 });
                 AdminLTEDashboard.showToast('All notifications cleared', 'info');
@@ -184,11 +141,11 @@
         // ============================================
         // SIDEBAR TOGGLE
         // ============================================
-        initSidebarToggle: function() {
-            $(document).on('click', '[data-widget="pushmenu"]', function(e) {
+        initSidebarToggle: function () {
+            $(document).on('click', '[data-widget="pushmenu"]', function (e) {
                 e.preventDefault();
                 $('body').toggleClass('sidebar-collapse');
-                
+
                 // Save state to localStorage
                 const isCollapsed = $('body').hasClass('sidebar-collapse');
                 localStorage.setItem('sidebar-collapsed', isCollapsed);
@@ -204,8 +161,8 @@
         // ============================================
         // SMOOTH SCROLL
         // ============================================
-        initSmoothScroll: function() {
-            $('a[href^="#"]').on('click', function(e) {
+        initSmoothScroll: function () {
+            $('a[href^="#"]').on('click', function (e) {
                 const target = $(this.getAttribute('href'));
                 if (target.length) {
                     e.preventDefault();
@@ -219,11 +176,11 @@
         // ============================================
         // ALERT AUTO CLOSE
         // ============================================
-        initAlertAutoClose: function() {
-            $('.alert:not(.alert-permanent)').each(function() {
+        initAlertAutoClose: function () {
+            $('.alert:not(.alert-permanent)').each(function () {
                 const $alert = $(this);
                 setTimeout(() => {
-                    $alert.fadeOut(500, function() {
+                    $alert.fadeOut(500, function () {
                         $(this).remove();
                     });
                 }, 5000);
@@ -233,14 +190,14 @@
         // ============================================
         // TABLE ACTIONS
         // ============================================
-        initTableActions: function() {
+        initTableActions: function () {
             // Delete row
-            $(document).on('click', '.btn-delete', function(e) {
+            $(document).on('click', '.btn-delete', function (e) {
                 e.preventDefault();
                 const $row = $(this).closest('tr');
-                
+
                 if (confirm('Are you sure you want to delete this item?')) {
-                    $row.fadeOut(300, function() {
+                    $row.fadeOut(300, function () {
                         $(this).remove();
                         AdminLTEDashboard.showToast('Item deleted successfully', 'success');
                     });
@@ -248,13 +205,13 @@
             });
 
             // Edit row
-            $(document).on('click', '.btn-edit', function(e) {
+            $(document).on('click', '.btn-edit', function (e) {
                 e.preventDefault();
                 AdminLTEDashboard.showToast('Edit functionality coming soon', 'info');
             });
 
             // View details
-            $(document).on('click', '.btn-view', function(e) {
+            $(document).on('click', '.btn-view', function (e) {
                 e.preventDefault();
                 AdminLTEDashboard.showToast('View details coming soon', 'info');
             });
@@ -263,41 +220,23 @@
         // ============================================
         // QUICK ACTIONS
         // ============================================
-        initQuickActions: function() {
-            $('.btn-lg.text-start').hover(
-                function() {
-                    $(this).css('transform', 'translateX(5px)');
-                },
-                function() {
-                    $(this).css('transform', 'translateX(0)');
-                }
-            );
+        initQuickActions: function () {
+            // Animations disabled
         },
 
         // ============================================
         // LOADING STATES
         // ============================================
-        initLoadingStates: function() {
+        initLoadingStates: function () {
             // Add loading state to buttons on click
-            $(document).on('click', '.btn[type="submit"]', function() {
-                const $btn = $(this);
-                const originalText = $btn.html();
-                
-                $btn.prop('disabled', true);
-                $btn.html('<span class="loading-spinner me-2"></span>Loading...');
-                
-                // Remove loading state after form submission (adjust as needed)
-                setTimeout(() => {
-                    $btn.prop('disabled', false);
-                    $btn.html(originalText);
-                }, 3000);
-            });
+            // Loading state logic removed to prevent form submission issues
+            // $(document).on('click', '.btn[type="submit"]', function() { ... });
         },
 
         // ============================================
         // TOAST NOTIFICATIONS
         // ============================================
-        showToast: function(message, type = 'info') {
+        showToast: function (message, type = 'info') {
             const bgColors = {
                 'success': '#10b981',
                 'error': '#ef4444',
@@ -337,7 +276,7 @@
             $('body').append(toast);
 
             setTimeout(() => {
-                toast.fadeOut(300, function() {
+                toast.fadeOut(300, function () {
                     $(this).remove();
                 });
             }, 3000);
@@ -346,7 +285,7 @@
         // ============================================
         // CONFIRM DIALOG
         // ============================================
-        confirmDialog: function(message, callback) {
+        confirmDialog: function (message, callback) {
             if (confirm(message)) {
                 callback();
             }
@@ -355,7 +294,7 @@
         // ============================================
         // LOADING OVERLAY
         // ============================================
-        showLoading: function() {
+        showLoading: function () {
             const overlay = $(`
                 <div class="loading-overlay" style="
                     position: fixed;
@@ -389,8 +328,8 @@
             $('body').append(overlay);
         },
 
-        hideLoading: function() {
-            $('.loading-overlay').fadeOut(300, function() {
+        hideLoading: function () {
+            $('.loading-overlay').fadeOut(300, function () {
                 $(this).remove();
             });
         },
@@ -398,18 +337,18 @@
         // ============================================
         // REFRESH DATA
         // ============================================
-        refreshData: function(url, callback) {
+        refreshData: function (url, callback) {
             AdminLTEDashboard.showLoading();
-            
+
             $.ajax({
                 url: url,
                 method: 'GET',
-                success: function(response) {
+                success: function (response) {
                     AdminLTEDashboard.hideLoading();
                     if (callback) callback(response);
                     AdminLTEDashboard.showToast('Data refreshed successfully', 'success');
                 },
-                error: function() {
+                error: function () {
                     AdminLTEDashboard.hideLoading();
                     AdminLTEDashboard.showToast('Failed to refresh data', 'error');
                 }
@@ -420,7 +359,7 @@
     // ============================================
     // INITIALIZE ON DOCUMENT READY
     // ============================================
-    $(document).ready(function() {
+    $(document).ready(function () {
         AdminLTEDashboard.init();
     });
 
@@ -434,141 +373,5 @@
 // ============================================
 // CSS ANIMATIONS
 // ============================================
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-
-    @keyframes slideDown {
-        from {
-            transform: translateY(-20px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-
-    .toast-notification {
-        animation: slideInRight 0.3s ease;
-    }
-
-    .card {
-        animation: fadeIn 0.5s ease;
-    }
-
-    .stat-card {
-        transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .btn {
-        transition: all 0.15s ease;
-    }
-
-    .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .loading-spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(99, 102, 241, 0.3);
-        border-radius: 50%;
-        border-top-color: #6366f1;
-        animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    .table tbody tr {
-        transition: background-color 0.15s ease;
-    }
-
-    .table tbody tr:hover {
-        background-color: rgba(99, 102, 241, 0.05);
-    }
-
-    .notification-item {
-        transition: all 0.3s ease;
-    }
-
-    .notification-item:hover {
-        background-color: rgba(99, 102, 241, 0.05);
-        transform: translateX(5px);
-    }
-
-    .sidebar {
-        transition: all 0.3s ease;
-    }
-
-    .sidebar-collapse .sidebar {
-        margin-left: -250px;
-    }
-
-    /* Smooth page transitions */
-    .page-content {
-        animation: fadeIn 0.5s ease;
-    }
-
-    /* Card hover effects */
-    .card-hover {
-        transition: all 0.3s ease;
-    }
-
-    .card-hover:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    }
-
-    /* Button ripple effect */
-    .btn {
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.5);
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
-    }
-
-    .btn:active::after {
-        width: 300px;
-        height: 300px;
-    }
-`;
-document.head.appendChild(style);
+// CSS Animations disabled
+// const style = document.createElement('style'); ...

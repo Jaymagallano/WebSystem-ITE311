@@ -7,7 +7,7 @@
                 <h2><i class="bi bi-pencil-square"></i> Grade Submission</h2>
                 <p class="text-muted mb-0"><?= $submission->assignment_title ?></p>
             </div>
-            <?php 
+            <?php
             $return_url = $this->input->get('return');
             if ($return_url === 'stats') {
                 $back_url = base_url('teacher/assignment_stats/' . $submission->assignment_id);
@@ -33,7 +33,7 @@
                 <p><strong>Name:</strong> <?= $submission->student_name ?></p>
                 <p><strong>Submitted:</strong> <?= date('F j, Y g:i A', strtotime($submission->submitted_at)) ?></p>
                 <?php if ($submission->file_name): ?>
-                    <?php 
+                    <?php
                     // Fix file path - remove full Windows path if present
                     $clean_path = $submission->file_path;
                     if (strpos($clean_path, 'htdocs') !== false) {
@@ -46,7 +46,7 @@
                         }
                     }
                     ?>
-                    <p><strong>File:</strong> 
+                    <p><strong>File:</strong>
                         <a href="<?= base_url($clean_path) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-download"></i> <?= $submission->file_name ?>
                         </a>
@@ -55,7 +55,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-6">
         <div class="card">
             <div class="card-header bg-white">
@@ -65,9 +65,10 @@
                 <p><strong>Course:</strong> <?= $course->title ?> (<?= $course->code ?>)</p>
                 <p><strong>Max Points:</strong> <?= $submission->max_points ?></p>
                 <?php if ($submission->score !== null): ?>
-                    <p><strong>Current Grade:</strong> 
+                    <p><strong>Current Grade:</strong>
                         <span class="badge bg-info"><?= $submission->score ?> / <?= $submission->max_points ?></span>
-                        <small class="text-muted">(<?= number_format(($submission->score / $submission->max_points) * 100, 1) ?>%)</small>
+                        <small
+                            class="text-muted">(<?= number_format(($submission->score / $submission->max_points) * 100, 1) ?>%)</small>
                     </p>
                 <?php else: ?>
                     <p><strong>Status:</strong> <span class="badge bg-warning">Not Graded</span></p>
@@ -91,43 +92,35 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 <?php endif; ?>
-                
+
                 <?php echo form_open('teacher/grade_submission/' . $submission->id . ($this->input->get('return') ? '?return=' . $this->input->get('return') : '')); ?>
-                    <div class="mb-3">
-                        <label for="score" class="form-label">Score <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <input type="number" 
-                                   class="form-control" 
-                                   id="score" 
-                                   name="score" 
-                                   min="0" 
-                                   max="<?= $submission->max_points ?>" 
-                                   step="0.01"
-                                   value="<?= $submission->score ?? '' ?>" 
-                                   required>
-                            <span class="input-group-text">/ <?= $submission->max_points ?></span>
-                        </div>
-                        <small class="text-muted">Enter a score between 0 and <?= $submission->max_points ?></small>
+                <div class="mb-3">
+                    <label for="score" class="form-label">Score <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="score" name="score" min="0"
+                            max="<?= $submission->max_points ?>" step="0.01" value="<?= $submission->score ?? '' ?>"
+                            required>
+                        <span class="input-group-text">/ <?= $submission->max_points ?></span>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="feedback" class="form-label">Feedback</label>
-                        <textarea class="form-control" 
-                                  id="feedback" 
-                                  name="feedback" 
-                                  rows="5" 
-                                  placeholder="Provide feedback to the student..."><?= $submission->feedback ?? '' ?></textarea>
-                        <small class="text-muted">Optional: Provide constructive feedback to help the student improve</small>
-                    </div>
-                    
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-circle"></i> Save Grade
-                        </button>
-                        <a href="<?= $back_url ?>" class="btn btn-secondary">
-                            <i class="bi bi-x-circle"></i> Cancel
-                        </a>
-                    </div>
+                    <small class="text-muted">Enter a score between 0 and <?= $submission->max_points ?></small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="feedback" class="form-label">Feedback</label>
+                    <textarea class="form-control" id="feedback" name="feedback" rows="5"
+                        placeholder="Provide feedback to the student..."><?= $submission->feedback ?? '' ?></textarea>
+                    <small class="text-muted">Optional: Provide constructive feedback to help the student
+                        improve</small>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Save Grade
+                    </button>
+                    <a href="<?= $back_url ?>" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </div>
                 <?php echo form_close(); ?>
             </div>
         </div>

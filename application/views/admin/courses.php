@@ -1,13 +1,13 @@
 <?php $this->load->view('templates/header', ['page_title' => 'Manage Courses']); ?>
 
-<?php if($this->session->flashdata('success')): ?>
+<?php if ($this->session->flashdata('success')): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="bi bi-check-circle"></i> <?= $this->session->flashdata('success') ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
 
-<?php if($this->session->flashdata('error')): ?>
+<?php if ($this->session->flashdata('error')): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="bi bi-exclamation-triangle"></i> <?= $this->session->flashdata('error') ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -48,23 +48,27 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if(isset($courses) && count($courses) > 0): ?>
-                                <?php foreach($courses as $course): ?>
+                            <?php if (isset($courses) && count($courses) > 0): ?>
+                                <?php foreach ($courses as $course): ?>
                                     <tr>
                                         <td><?= $course->id ?></td>
                                         <td><span class="badge bg-info"><?= $course->code ?></span></td>
                                         <td><strong><?= $course->title ?></strong></td>
                                         <td>
-                                            <i class="bi bi-person-badge"></i> <?= $course->teacher_name ?>
+                                            <i class="bi bi-person-badge"></i>
+                                            <?= $course->teacher_name ? $course->teacher_name : 'Unknown Teacher' ?>
                                         </td>
                                         <td><?= date('M d, Y', strtotime($course->created_at)) ?></td>
                                         <td>
-                                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal<?= $course->id ?>">
+                                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                                data-bs-target="#viewModal<?= $course->id ?>">
                                                 <i class="bi bi-eye"></i> View
                                             </a>
-                                            <a href="<?= base_url('admin/delete_course/'.$course->id) ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this course? This will also delete all related data.')">
+                                            <?= form_open('admin/delete_course/' . $course->id, ['style' => 'display:inline;', 'onsubmit' => "return confirm('Are you sure you want to delete this course? This will also delete all related data.');"]) ?>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
                                                 <i class="bi bi-trash"></i> Delete
-                                            </a>
+                                            </button>
+                                            <?= form_close() ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -85,9 +89,10 @@
 </div>
 
 <!-- View Modals -->
-<?php if(isset($courses) && count($courses) > 0): ?>
-    <?php foreach($courses as $course): ?>
-        <div class="modal fade" id="viewModal<?= $course->id ?>" tabindex="-1" aria-labelledby="viewModalLabel<?= $course->id ?>" aria-hidden="true">
+<?php if (isset($courses) && count($courses) > 0): ?>
+    <?php foreach ($courses as $course): ?>
+        <div class="modal fade" id="viewModal<?= $course->id ?>" tabindex="-1"
+            aria-labelledby="viewModalLabel<?= $course->id ?>" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -107,7 +112,9 @@
                         </div>
                         <div class="mb-3">
                             <strong><i class="bi bi-file-text"></i> Description:</strong>
-                            <p class="text-muted"><?= !empty($course->description) ? $course->description : 'No description available' ?></p>
+                            <p class="text-muted">
+                                <?= !empty($course->description) ? $course->description : 'No description available' ?>
+                            </p>
                         </div>
                         <div class="mb-3">
                             <strong><i class="bi bi-calendar-event"></i> Created:</strong>
