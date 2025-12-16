@@ -4,16 +4,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Auth extends CI_Controller {
     
     public function register() {
+        $this->load->helper('security_sanitize');
+        
         if ($this->input->method() == 'post') {
-            $this->form_validation->set_rules('name', 'Name', 'required|trim');
-            $this->form_validation->set_rules('email', 'Email', 'required|valid_email|is_unique[users.email]');
-            $this->form_validation->set_rules('password', 'Password', 'required|min_length[6]');
+            // Comprehensive validation rules
+            $this->form_validation->set_rules('name', 'Name', 'required|trim|min_length[2]|max_length[100]|regex_match[/^[a-zA-Z\s\-\.]+$/]',
+                array('regex_match' => 'Name can only contain letters, spaces, hyphens, and periods'));
+            $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|max_length[255]|is_unique[users.email]');
+            $this->form_validation->set_rules('password', 'Password', 'required|min_length[8]|max_length[72]|callback_check_password_strength');
             $this->form_validation->set_rules('password_confirm', 'Confirm Password', 'required|matches[password]');
             
             if ($this->form_validation->run()) {
+                // Sanitize inputs before storing
+                $name = sanitize_string($this->input->post('name', TRUE));
+                $email = strtolower(trim($this->input->post('email', TRUE)));
+                
                 $data = array(
-                    'name' => $this->input->post('name'),
-                    'email' => $this->input->post('email'),
+                    'name' => $name,
+                    'email' => $email,
                     'password' => password_hash($this->input->post('password'), PASSWORD_DEFAULT),
                     'role' => 'student',
                     'created_at' => date('Y-m-d H:i:s')
@@ -29,6 +37,21 @@ class Auth extends CI_Controller {
         $this->load->view('auth/register');
     }
     
+    /**
+     * Callback function to check password strength
+     */
+    public function check_password_strength($password) {
+        if (!preg_match('/[A-Za-z]/', $password)) {
+            $this->form_validation->set_message('check_password_strength', 'Password must contain at least one letter');
+            return FALSE;
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            $this->form_validation->set_message('check_password_strength', 'Password must contain at least one number');
+            return FALSE;
+        }
+        return TRUE;
+    }
+    
     public function login() {
         // Prevent logged-in users from accessing login page
         if ($this->session->userdata('logged_in')) {
@@ -36,11 +59,13 @@ class Auth extends CI_Controller {
         }
         
         if ($this->input->method() == 'post') {
-            $this->form_validation->set_rules('email', 'Email', 'required|valid_email|trim');
-            $this->form_validation->set_rules('password', 'Password', 'required');
+            // Enhanced validation with length limits
+            $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|max_length[255]');
+            $this->form_validation->set_rules('password', 'Password', 'required|max_length[72]');
             
             if ($this->form_validation->run()) {
-                $email = $this->input->post('email', TRUE);
+                // Sanitize email input
+                $email = strtolower(trim($this->input->post('email', TRUE)));
                 $password = $this->input->post('password');
                 
                 // Fetch user from database

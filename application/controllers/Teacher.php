@@ -24,6 +24,7 @@ class Teacher extends CI_Controller
         $this->load->model('Material_model');
         $this->load->model('Notification_model');
         $this->load->model('Student_model');
+        $this->load->helper('security_sanitize');
     }
 
     public function courses()
@@ -50,15 +51,17 @@ class Teacher extends CI_Controller
     public function create_course()
     {
         if ($this->input->method() == 'post') {
-            $this->form_validation->set_rules('title', 'Course Title', 'required|trim');
-            $this->form_validation->set_rules('description', 'Description', 'required|trim');
-            $this->form_validation->set_rules('code', 'Course Code', 'required|trim|is_unique[courses.code]');
+            // Enhanced validation with length limits and format checks
+            $this->form_validation->set_rules('title', 'Course Title', 'required|trim|min_length[3]|max_length[200]');
+            $this->form_validation->set_rules('description', 'Description', 'required|trim|min_length[10]|max_length[5000]');
+            $this->form_validation->set_rules('code', 'Course Code', 'required|trim|alpha_dash|min_length[3]|max_length[20]|is_unique[courses.code]');
 
             if ($this->form_validation->run()) {
+                // Sanitize all inputs before storing
                 $data = array(
-                    'title' => $this->input->post('title'),
-                    'description' => $this->input->post('description'),
-                    'code' => strtoupper($this->input->post('code')),
+                    'title' => sanitize_string($this->input->post('title', TRUE)),
+                    'description' => sanitize_string($this->input->post('description', TRUE)),
+                    'code' => strtoupper(preg_replace('/[^A-Za-z0-9\-]/', '', $this->input->post('code', TRUE))),
                     'teacher_id' => $this->session->userdata('user_id'),
                     'created_at' => date('Y-m-d H:i:s')
                 );
@@ -78,6 +81,13 @@ class Teacher extends CI_Controller
 
     public function edit_course($course_id)
     {
+        // Validate course_id is a positive integer
+        $course_id = intval($course_id);
+        if ($course_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid course ID.');
+            redirect('teacher/courses');
+        }
+        
         $course = $this->Course_model->get_course_by_id($course_id);
 
         if (!$course || $course->teacher_id != $this->session->userdata('user_id')) {
@@ -86,13 +96,15 @@ class Teacher extends CI_Controller
         }
 
         if ($this->input->method() == 'post') {
-            $this->form_validation->set_rules('title', 'Course Title', 'required|trim');
-            $this->form_validation->set_rules('description', 'Description', 'required|trim');
+            // Enhanced validation with length limits
+            $this->form_validation->set_rules('title', 'Course Title', 'required|trim|min_length[3]|max_length[200]');
+            $this->form_validation->set_rules('description', 'Description', 'required|trim|min_length[10]|max_length[5000]');
 
             if ($this->form_validation->run()) {
+                // Sanitize inputs before storing
                 $data = array(
-                    'title' => $this->input->post('title'),
-                    'description' => $this->input->post('description'),
+                    'title' => sanitize_string($this->input->post('title', TRUE)),
+                    'description' => sanitize_string($this->input->post('description', TRUE)),
                     'updated_at' => date('Y-m-d H:i:s')
                 );
 
@@ -112,14 +124,19 @@ class Teacher extends CI_Controller
     {
         $data['user'] = $this->session->userdata();
 
-        // Get filter parameters - prioritize GET parameter over URL segment
-        $course_filter = $this->input->get('course_id') ?: $course_id;
-        $search = $this->input->get('search');
-        $status = $this->input->get('status');
-        $sort_by = $this->input->get('sort_by') ?: 'name';
-        $sort_order = $this->input->get('sort_order') ?: 'asc';
+        // Get and validate filter parameters
+        $course_filter = intval($this->input->get('course_id') ?: $course_id);
+        $search = sanitize_string($this->input->get('search', TRUE));
+        $status = sanitize_string($this->input->get('status', TRUE));
+        
+        // Whitelist allowed sort fields
+        $allowed_sort = ['name', 'email', 'enrolled_date', 'registered_date'];
+        $sort_by = in_array($this->input->get('sort_by'), $allowed_sort) ? $this->input->get('sort_by') : 'name';
+        
+        // Whitelist allowed sort orders  
+        $sort_order = in_array($this->input->get('sort_order'), ['asc', 'desc']) ? $this->input->get('sort_order') : 'asc';
 
-        if ($course_filter) {
+        if ($course_filter > 0) {
             $data['course'] = $this->Course_model->get_course_by_id($course_filter);
             $this->db->select('users.*, enrollments.enrolled_at');
             $this->db->from('users');
@@ -209,12 +226,17 @@ class Teacher extends CI_Controller
 
     public function students_ajax($course_id = null)
     {
-        // Get filter parameters - prioritize POST parameter
-        $course_filter = $this->input->post('course_id') ?: $course_id;
-        $search = $this->input->post('search');
-        $status = $this->input->post('status');
-        $sort_by = $this->input->post('sort_by') ?: 'name';
-        $sort_order = $this->input->post('sort_order') ?: 'asc';
+        // Validate and sanitize filter parameters
+        $course_filter = intval($this->input->post('course_id') ?: $course_id);
+        $search = sanitize_string($this->input->post('search', TRUE));
+        $status = sanitize_string($this->input->post('status', TRUE));
+        
+        // Whitelist allowed sort fields
+        $allowed_sort = ['name', 'email', 'enrolled_date', 'registered_date'];
+        $sort_by = in_array($this->input->post('sort_by'), $allowed_sort) ? $this->input->post('sort_by') : 'name';
+        
+        // Whitelist allowed sort orders
+        $sort_order = in_array($this->input->post('sort_order'), ['asc', 'desc']) ? $this->input->post('sort_order') : 'asc';
 
         if ($course_filter) {
             $course = $this->Course_model->get_course_by_id($course_filter);
@@ -336,7 +358,8 @@ class Teacher extends CI_Controller
             ->set_output(json_encode([
                 'success' => true,
                 'html' => $html,
-                'count' => count($students)
+                'count' => count($students),
+                'csrf_token' => $this->security->get_csrf_hash()
             ]));
     }
 
@@ -350,6 +373,13 @@ class Teacher extends CI_Controller
 
     public function assignment_submissions($assignment_id)
     {
+        // Validate assignment_id is a positive integer
+        $assignment_id = intval($assignment_id);
+        if ($assignment_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid assignment ID.');
+            redirect('teacher/assignments');
+        }
+        
         // Get assignment details
         $assignment = $this->Assignment_model->get_assignment_by_id($assignment_id);
 
@@ -380,6 +410,13 @@ class Teacher extends CI_Controller
 
     public function assignment_stats($assignment_id)
     {
+        // Validate assignment_id is a positive integer
+        $assignment_id = intval($assignment_id);
+        if ($assignment_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid assignment ID.');
+            redirect('teacher/assignments');
+        }
+        
         $assignment = $this->Assignment_model->get_assignment_by_id($assignment_id);
 
         if (!$assignment) {
@@ -449,19 +486,29 @@ class Teacher extends CI_Controller
     public function create_assignment()
     {
         if ($this->input->method() == 'post') {
-            $this->form_validation->set_rules('title', 'Assignment Title', 'required|trim');
-            $this->form_validation->set_rules('description', 'Description', 'required|trim');
-            $this->form_validation->set_rules('course_id', 'Course', 'required');
-            $this->form_validation->set_rules('due_date', 'Due Date', 'required');
-            $this->form_validation->set_rules('max_points', 'Max Points', 'required|numeric');
+            // Enhanced validation with length limits and type checks
+            $this->form_validation->set_rules('title', 'Assignment Title', 'required|trim|min_length[3]|max_length[200]');
+            $this->form_validation->set_rules('description', 'Description', 'required|trim|min_length[10]|max_length[5000]');
+            $this->form_validation->set_rules('course_id', 'Course', 'required|integer|greater_than[0]');
+            $this->form_validation->set_rules('due_date', 'Due Date', 'required|callback_validate_datetime');
+            $this->form_validation->set_rules('max_points', 'Max Points', 'required|numeric|greater_than[0]|less_than[10000]');
 
             if ($this->form_validation->run()) {
+                // Verify course belongs to this teacher
+                $course_id = intval($this->input->post('course_id'));
+                $course = $this->Course_model->get_course_by_id($course_id);
+                if (!$course || $course->teacher_id != $this->session->userdata('user_id')) {
+                    $this->session->set_flashdata('error', 'Invalid course selected.');
+                    redirect('teacher/create_assignment');
+                }
+                
+                // Sanitize inputs before storing
                 $data = array(
-                    'title' => $this->input->post('title'),
-                    'description' => $this->input->post('description'),
-                    'course_id' => $this->input->post('course_id'),
-                    'due_date' => $this->input->post('due_date'),
-                    'max_points' => $this->input->post('max_points'),
+                    'title' => sanitize_string($this->input->post('title', TRUE)),
+                    'description' => sanitize_string($this->input->post('description', TRUE)),
+                    'course_id' => $course_id,
+                    'due_date' => $this->input->post('due_date', TRUE),
+                    'max_points' => floatval($this->input->post('max_points')),
                     'created_at' => date('Y-m-d H:i:s')
                 );
 
@@ -483,16 +530,32 @@ class Teacher extends CI_Controller
         $data['courses'] = $this->Course_model->get_teacher_courses($this->session->userdata('user_id'));
         $this->load->view('teacher/create_assignment', $data);
     }
+    
+    /**
+     * Callback to validate datetime format
+     */
+    public function validate_datetime($datetime) {
+        // Accept common datetime formats
+        $formats = ['Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d\TH:i:s', 'Y-m-d\TH:i'];
+        foreach ($formats as $format) {
+            $d = DateTime::createFromFormat($format, $datetime);
+            if ($d && $d->format($format) === $datetime) {
+                return TRUE;
+            }
+        }
+        $this->form_validation->set_message('validate_datetime', 'The {field} must be a valid date and time.');
+        return FALSE;
+    }
 
     public function grades($course_id = null)
     {
         $data['user'] = $this->session->userdata();
         $data['courses'] = $this->Course_model->get_teacher_courses($this->session->userdata('user_id'));
 
-        // Get course from query parameter or URL segment
-        $course_filter = $this->input->get('course_id') ?: $course_id;
+        // Get and validate course from query parameter or URL segment
+        $course_filter = intval($this->input->get('course_id') ?: $course_id);
 
-        if ($course_filter) {
+        if ($course_filter > 0) {
             $data['selected_course'] = $this->Course_model->get_course_by_id($course_filter);
             $data['students'] = $this->Course_model->get_enrolled_students($course_filter);
             $data['assignments'] = $this->Assignment_model->get_course_assignments($course_filter);
@@ -509,9 +572,10 @@ class Teacher extends CI_Controller
 
     public function grades_ajax()
     {
-        $course_id = $this->input->post('course_id');
+        // Validate course_id is a positive integer
+        $course_id = intval($this->input->post('course_id'));
 
-        if (!$course_id) {
+        if ($course_id <= 0) {
             $this->output
                 ->set_content_type('application/json')
                 ->set_output(json_encode([
@@ -568,12 +632,21 @@ class Teacher extends CI_Controller
                 'success' => true,
                 'html' => $html,
                 'course_title' => $course->title,
-                'student_count' => count($students)
+                'student_count' => count($students),
+                'csrf_token' => $this->security->get_csrf_hash()
             ]));
     }
 
     public function student_grades($course_id, $student_id)
     {
+        // Validate IDs are positive integers
+        $course_id = intval($course_id);
+        $student_id = intval($student_id);
+        if ($course_id <= 0 || $student_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid course or student ID.');
+            redirect('teacher/grades');
+        }
+        
         // Verify course belongs to teacher
         $course = $this->Course_model->get_course_by_id($course_id);
         if (!$course || $course->teacher_id != $this->session->userdata('user_id')) {
@@ -634,10 +707,10 @@ class Teacher extends CI_Controller
         $data['user'] = $this->session->userdata();
         $data['courses'] = $this->Course_model->get_teacher_courses($this->session->userdata('user_id'));
 
-        // Get course from query parameter or URL segment
-        $course_filter = $this->input->get('course_id') ?: $course_id;
+        // Get and validate course from query parameter or URL segment
+        $course_filter = intval($this->input->get('course_id') ?: $course_id);
 
-        if ($course_filter) {
+        if ($course_filter > 0) {
             $data['selected_course'] = $this->Course_model->get_course_by_id($course_filter);
             $data['materials'] = $this->Material_model->get_course_materials($course_filter);
         }
@@ -648,9 +721,10 @@ class Teacher extends CI_Controller
 
     public function materials_ajax()
     {
-        $course_id = $this->input->post('course_id');
+        // Validate course_id is a positive integer
+        $course_id = intval($this->input->post('course_id'));
 
-        if (!$course_id) {
+        if ($course_id <= 0) {
             $this->output
                 ->set_content_type('application/json')
                 ->set_output(json_encode([
@@ -692,14 +766,25 @@ class Teacher extends CI_Controller
                 'html' => $html,
                 'course_title' => $course->title,
                 'course_code' => $course->code,
-                'material_count' => count($materials)
+                'material_count' => count($materials),
+                'csrf_token' => $this->security->get_csrf_hash()
             ]));
     }
 
     public function upload_material()
     {
         if ($this->input->method() == 'post') {
-            $course_id = $this->input->post('course_id');
+            // Validate form inputs
+            $this->form_validation->set_rules('course_id', 'Course', 'required|integer|greater_than[0]');
+            $this->form_validation->set_rules('title', 'Title', 'required|trim|min_length[3]|max_length[200]');
+            $this->form_validation->set_rules('description', 'Description', 'trim|max_length[1000]');
+            
+            if (!$this->form_validation->run()) {
+                $this->session->set_flashdata('error', validation_errors());
+                redirect('teacher/upload_material');
+            }
+            
+            $course_id = intval($this->input->post('course_id'));
 
             // Verify course belongs to teacher
             $course = $this->Course_model->get_course_by_id($course_id);
@@ -711,6 +796,8 @@ class Teacher extends CI_Controller
             $config['upload_path'] = './uploads/materials/';
             $config['allowed_types'] = 'pdf|doc|docx|ppt|pptx|xls|xlsx|txt|zip';
             $config['max_size'] = 10240; // 10MB
+            $config['file_ext_tolower'] = TRUE;
+            $config['remove_spaces'] = TRUE;
 
             $this->load->library('upload', $config);
 
@@ -721,9 +808,10 @@ class Teacher extends CI_Controller
             if ($this->upload->do_upload('file')) {
                 $upload_data = $this->upload->data();
 
+                // Sanitize inputs before storing
                 $data = array(
-                    'title' => $this->input->post('title'),
-                    'description' => $this->input->post('description'),
+                    'title' => sanitize_string($this->input->post('title', TRUE)),
+                    'description' => sanitize_string($this->input->post('description', TRUE)),
                     'file_name' => $upload_data['file_name'],
                     'file_path' => 'uploads/materials/' . $upload_data['file_name'],
                     'file_type' => $upload_data['file_type'],
@@ -753,6 +841,13 @@ class Teacher extends CI_Controller
 
     public function delete_material($material_id)
     {
+        // Validate material_id is a positive integer
+        $material_id = intval($material_id);
+        if ($material_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid material ID.');
+            redirect('teacher/materials');
+        }
+        
         // Get material first
         $material = $this->Material_model->get_material_by_id($material_id);
 
@@ -790,6 +885,13 @@ class Teacher extends CI_Controller
 
     public function grade_submission($submission_id)
     {
+        // Validate submission_id is a positive integer
+        $submission_id = intval($submission_id);
+        if ($submission_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid submission ID.');
+            redirect('teacher/assignments');
+        }
+        
         // Get submission details
         $this->db->select('assignment_submissions.*, assignments.title as assignment_title, assignments.max_points, assignments.course_id, users.name as student_name');
         $this->db->from('assignment_submissions');
@@ -811,22 +913,27 @@ class Teacher extends CI_Controller
         }
 
         if ($this->input->method() == 'post') {
-            $score = $this->input->post('score');
-            $feedback = $this->input->post('feedback');
+            // Enhanced validation for score
+            $this->form_validation->set_rules('score', 'Score', 'required|numeric|greater_than_equal_to[0]');
+            $this->form_validation->set_rules('feedback', 'Feedback', 'trim|max_length[5000]');
+            
+            // Sanitize and validate inputs
+            $score = floatval($this->input->post('score'));
+            $feedback = sanitize_string($this->input->post('feedback', TRUE));
 
             // Debug logging
             log_message('debug', 'Grade Submission - ID: ' . $submission_id . ', Score: ' . $score . ', Feedback: ' . $feedback);
 
-            // Validate score
-            if ($score === null || $score === '') {
-                $this->session->set_flashdata('error', 'Score is required.');
-                redirect('teacher/grade_submission/' . $submission_id . ($this->input->get('return') ? '?return=' . $this->input->get('return') : ''));
+            // Validate score is numeric
+            if (!is_numeric($this->input->post('score')) || $this->input->post('score') === '') {
+                $this->session->set_flashdata('error', 'Score is required and must be a number.');
+                redirect('teacher/grade_submission/' . $submission_id . ($this->input->get('return') ? '?return=' . urlencode($this->input->get('return', TRUE)) : ''));
                 return;
             }
 
             if ($score < 0 || $score > $submission->max_points) {
                 $this->session->set_flashdata('error', 'Score must be between 0 and ' . $submission->max_points);
-                redirect('teacher/grade_submission/' . $submission_id . ($this->input->get('return') ? '?return=' . $this->input->get('return') : ''));
+                redirect('teacher/grade_submission/' . $submission_id . ($this->input->get('return') ? '?return=' . urlencode($this->input->get('return', TRUE)) : ''));
                 return;
             }
 
@@ -869,6 +976,13 @@ class Teacher extends CI_Controller
 
     public function edit_assignment($assignment_id)
     {
+        // Validate assignment_id is a positive integer
+        $assignment_id = intval($assignment_id);
+        if ($assignment_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid assignment ID.');
+            redirect('teacher/assignments');
+        }
+        
         // Get assignment details
         $assignment = $this->Assignment_model->get_assignment_by_id($assignment_id);
 
@@ -885,17 +999,19 @@ class Teacher extends CI_Controller
         }
 
         if ($this->input->method() == 'post') {
-            $this->form_validation->set_rules('title', 'Assignment Title', 'required|trim');
-            $this->form_validation->set_rules('description', 'Description', 'required|trim');
-            $this->form_validation->set_rules('due_date', 'Due Date', 'required');
-            $this->form_validation->set_rules('max_points', 'Max Points', 'required|numeric');
+            // Enhanced validation with length limits
+            $this->form_validation->set_rules('title', 'Assignment Title', 'required|trim|min_length[3]|max_length[200]');
+            $this->form_validation->set_rules('description', 'Description', 'required|trim|min_length[10]|max_length[5000]');
+            $this->form_validation->set_rules('due_date', 'Due Date', 'required|callback_validate_datetime');
+            $this->form_validation->set_rules('max_points', 'Max Points', 'required|numeric|greater_than[0]|less_than[10000]');
 
             if ($this->form_validation->run()) {
+                // Sanitize inputs before storing
                 $data = array(
-                    'title' => $this->input->post('title'),
-                    'description' => $this->input->post('description'),
-                    'due_date' => $this->input->post('due_date'),
-                    'max_points' => $this->input->post('max_points'),
+                    'title' => sanitize_string($this->input->post('title', TRUE)),
+                    'description' => sanitize_string($this->input->post('description', TRUE)),
+                    'due_date' => $this->input->post('due_date', TRUE),
+                    'max_points' => floatval($this->input->post('max_points')),
                     'updated_at' => date('Y-m-d H:i:s')
                 );
 
@@ -923,6 +1039,13 @@ class Teacher extends CI_Controller
 
     public function student_profile($student_id)
     {
+        // Validate student_id is a positive integer
+        $student_id = intval($student_id);
+        if ($student_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid student ID.');
+            redirect('teacher/students');
+        }
+        
         $student = $this->Student_model->get_student_by_id($student_id);
 
         if (!$student) {
@@ -941,6 +1064,13 @@ class Teacher extends CI_Controller
 
     public function edit_student($student_id)
     {
+        // Validate student_id is a positive integer
+        $student_id = intval($student_id);
+        if ($student_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid student ID.');
+            redirect('teacher/students');
+        }
+        
         $student = $this->Student_model->get_student_by_id($student_id);
 
         if (!$student) {
@@ -949,15 +1079,19 @@ class Teacher extends CI_Controller
         }
 
         if ($this->input->method() == 'post') {
-            $this->form_validation->set_rules('name', 'Name', 'required|trim');
-            $this->form_validation->set_rules('email', 'Email', 'required|valid_email|trim');
+            // Enhanced validation with length limits
+            $this->form_validation->set_rules('name', 'Name', 'required|trim|min_length[2]|max_length[100]');
+            $this->form_validation->set_rules('email', 'Email', 'required|valid_email|trim|max_length[255]');
+            $this->form_validation->set_rules('phone', 'Phone', 'trim|max_length[20]|regex_match[/^[0-9\-\+\(\)\s]*$/]');
+            $this->form_validation->set_rules('address', 'Address', 'trim|max_length[500]');
 
             if ($this->form_validation->run()) {
+                // Sanitize inputs before storing
                 $update_data = [
-                    'name' => $this->input->post('name'),
-                    'email' => $this->input->post('email'),
-                    'phone' => $this->input->post('phone'),
-                    'address' => $this->input->post('address'),
+                    'name' => sanitize_string($this->input->post('name', TRUE)),
+                    'email' => strtolower(trim($this->input->post('email', TRUE))),
+                    'phone' => preg_replace('/[^0-9\-\+\(\)\s]/', '', $this->input->post('phone', TRUE)),
+                    'address' => sanitize_string($this->input->post('address', TRUE)),
                     'updated_at' => date('Y-m-d H:i:s')
                 ];
 
@@ -1093,6 +1227,13 @@ class Teacher extends CI_Controller
 
     public function course_report($course_id)
     {
+        // Validate course_id is a positive integer
+        $course_id = intval($course_id);
+        if ($course_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid course ID.');
+            redirect('teacher/reports');
+        }
+        
         // Verify course belongs to teacher
         $course = $this->Course_model->get_course_by_id($course_id);
         if (!$course || $course->teacher_id != $this->session->userdata('user_id')) {

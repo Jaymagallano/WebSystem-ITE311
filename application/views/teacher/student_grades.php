@@ -185,6 +185,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="gradeForm" method="post">
+                <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
                 <input type="hidden" name="course_id" id="courseIdInput">
                 <input type="hidden" name="student_id" id="studentIdInput">
                 <input type="hidden" name="redirect_to" value="student_grades">

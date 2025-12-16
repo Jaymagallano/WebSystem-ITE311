@@ -23,6 +23,7 @@ class Student extends CI_Controller
         $this->load->model('Grade_model');
         $this->load->model('Material_model');
         $this->load->model('Notification_model');
+        $this->load->helper('security_sanitize');
     }
 
     public function courses()
@@ -35,16 +36,18 @@ class Student extends CI_Controller
 
     public function enroll($course_id)
     {
-        // CSRF Protection disabled for normal usage
-        // Uncomment below lines to re-enable CSRF protection:
-        /*
-        $csrf_token = $this->input->post($this->config->item('csrf_token_name')) ?: $this->input->get($this->config->item('csrf_token_name'));
-        $csrf_cookie = $this->input->cookie($this->config->item('csrf_cookie_name'));
-
-        if (!$csrf_token || !$csrf_cookie || !hash_equals($csrf_cookie, $csrf_token)) {
-            show_error('The action you have requested is not allowed (CSRF token mismatch).', 403);
+        // Validate course_id is a positive integer
+        $course_id = intval($course_id);
+        if ($course_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid course ID.');
+            redirect('student/courses');
         }
-        */
+        
+        // Check if already enrolled
+        if ($this->Course_model->is_enrolled($this->session->userdata('user_id'), $course_id)) {
+            $this->session->set_flashdata('error', 'You are already enrolled in this course.');
+            redirect('student/courses');
+        }
 
         $course = $this->Course_model->get_course_by_id($course_id);
 
@@ -77,6 +80,13 @@ class Student extends CI_Controller
 
     public function course_details($course_id)
     {
+        // Validate course_id is a positive integer
+        $course_id = intval($course_id);
+        if ($course_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid course ID.');
+            redirect('student/courses');
+        }
+        
         $course = $this->Course_model->get_course_by_id($course_id);
 
         if (!$course || !$this->Course_model->is_enrolled($this->session->userdata('user_id'), $course_id)) {
@@ -100,6 +110,13 @@ class Student extends CI_Controller
 
     public function submit_assignment($assignment_id)
     {
+        // Validate assignment_id is a positive integer
+        $assignment_id = intval($assignment_id);
+        if ($assignment_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid assignment ID.');
+            redirect('student/assignments');
+        }
+        
         $assignment = $this->Assignment_model->get_assignment_by_id($assignment_id);
 
         if (!$assignment) {
@@ -108,9 +125,24 @@ class Student extends CI_Controller
         }
 
         if ($this->input->method() == 'post') {
+            // Verify student is enrolled in the course
+            if (!$this->Course_model->is_enrolled($this->session->userdata('user_id'), $assignment->course_id)) {
+                $this->session->set_flashdata('error', 'You are not enrolled in this course.');
+                redirect('student/assignments');
+            }
+            
+            // Check if assignment is past due date
+            if (strtotime($assignment->due_date) < time()) {
+                $this->session->set_flashdata('error', 'This assignment is past its due date.');
+                redirect('student/assignments');
+            }
+            
             $config['upload_path'] = './uploads/submissions/';
             $config['allowed_types'] = 'pdf|doc|docx|txt|zip';
             $config['max_size'] = 5120; // 5MB
+            $config['file_ext_tolower'] = TRUE;
+            $config['remove_spaces'] = TRUE;
+            $config['encrypt_name'] = TRUE; // Encrypt filename for security
 
             $this->load->library('upload', $config);
 
@@ -194,10 +226,10 @@ class Student extends CI_Controller
         $data['user'] = $this->session->userdata();
         $data['courses'] = $this->Course_model->get_student_courses($this->session->userdata('user_id'));
 
-        // Get course from query parameter or URL segment
-        $course_filter = $this->input->get('course_id') ?: $course_id;
+        // Get course from query parameter or URL segment and validate
+        $course_filter = intval($this->input->get('course_id') ?: $course_id);
 
-        if ($course_filter) {
+        if ($course_filter > 0) {
             if (!$this->Course_model->is_enrolled($this->session->userdata('user_id'), $course_filter)) {
                 $this->session->set_flashdata('error', 'Access denied.');
                 redirect('student/resources');
@@ -213,14 +245,15 @@ class Student extends CI_Controller
 
     public function resources_ajax()
     {
-        $course_id = $this->input->post('course_id');
+        // Validate and sanitize course_id
+        $course_id = intval($this->input->post('course_id'));
 
-        if (!$course_id) {
+        if ($course_id <= 0) {
             $this->output
                 ->set_content_type('application/json')
                 ->set_output(json_encode([
                     'success' => false,
-                    'message' => 'Course ID is required'
+                    'message' => 'Valid Course ID is required'
                 ]));
             return;
         }
@@ -282,12 +315,20 @@ class Student extends CI_Controller
                 'html' => $html,
                 'course_title' => $course->title,
                 'course_code' => $course->code,
-                'material_count' => count($materials)
+                'material_count' => count($materials),
+                'csrf_token' => $this->security->get_csrf_hash()
             ]));
     }
 
     public function download_material($material_id)
     {
+        // Validate material_id is a positive integer
+        $material_id = intval($material_id);
+        if ($material_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid material ID.');
+            redirect('student/resources');
+        }
+        
         $material = $this->Material_model->get_material_by_id($material_id);
 
         if (!$material || !$this->Course_model->is_enrolled($this->session->userdata('user_id'), $material->course_id)) {

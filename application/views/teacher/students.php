@@ -256,6 +256,11 @@
             })
                 .then(response => response.json())
                 .then(data => {
+                    // Update CSRF token for next request
+                    if (data.csrf_token) {
+                        window.csrf_hash = data.csrf_token;
+                    }
+                    
                     if (data.success) {
                         // Update table
                         tableBody.innerHTML = data.html;

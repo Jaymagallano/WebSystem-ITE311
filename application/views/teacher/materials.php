@@ -141,6 +141,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <form id="deleteForm" method="post" style="display: inline;">
+                    <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
                     <button type="submit" class="btn btn-danger">
                         <i class="bi bi-trash"></i> Delete
                     </button>
@@ -206,6 +207,11 @@
                 })
                     .then(response => response.json())
                     .then(data => {
+                        // Update CSRF token for next request
+                        if (data.csrf_token) {
+                            window.csrf_hash = data.csrf_token;
+                        }
+                        
                         if (data.success) {
                             // Update table
                             materialsTableContainer.innerHTML = `

@@ -23,6 +23,7 @@ class Admin extends CI_Controller
         $this->load->model('Settings_model'); // Load Settings Model
         $this->load->helper('download');
         $this->load->helper('form');
+        $this->load->helper('security_sanitize');
         $this->load->library('form_validation');
     }
 
@@ -69,11 +70,12 @@ class Admin extends CI_Controller
                     $generated_msg = "";
                 }
 
+                // Sanitize all inputs before storing
                 $data = array(
-                    'name' => $this->input->post('name'),
-                    'email' => $this->input->post('email'),
+                    'name' => sanitize_string($this->input->post('name', TRUE)),
+                    'email' => strtolower(trim($this->input->post('email', TRUE))),
                     'password' => password_hash($password, PASSWORD_DEFAULT),
-                    'role' => $this->input->post('role'),
+                    'role' => $this->input->post('role', TRUE),
                     'created_at' => $this->Settings_model->get_current_timestamp(), // Fix: Timezone handling
                     'created_by' => $this->session->userdata('user_id') // Fix: Audit Trail
                 );
@@ -94,6 +96,13 @@ class Admin extends CI_Controller
 
     public function edit_user($user_id)
     {
+        // Validate user_id is a positive integer
+        $user_id = intval($user_id);
+        if ($user_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid user ID.');
+            redirect('admin/users');
+        }
+        
         $edit_user = $this->User_model->get_user_by_id($user_id);
 
         if (!$edit_user) {
@@ -133,20 +142,22 @@ class Admin extends CI_Controller
                     redirect('admin/edit_user/' . $user_id);
                 }
 
+                // Sanitize inputs before storing
                 $data = array(
-                    'name' => $this->input->post('name'),
-                    'role' => $this->input->post('role'),
+                    'name' => sanitize_string($this->input->post('name', TRUE)),
+                    'role' => $this->input->post('role', TRUE),
                     'updated_at' => date('Y-m-d H:i:s')
                 );
 
                 // Add email to updates if it was part of the valid submission
                 if ($new_email && $new_email !== $edit_user->email) {
-                    $data['email'] = $new_email;
+                    $data['email'] = strtolower(trim($new_email));
                 }
 
-                // Update password only if provided
-                if ($this->input->post('password')) {
-                    $data['password'] = password_hash($this->input->post('password'), PASSWORD_DEFAULT);
+                // Update password only if provided (with length validation)
+                $new_password = $this->input->post('password');
+                if ($new_password && strlen($new_password) >= 8 && strlen($new_password) <= 72) {
+                    $data['password'] = password_hash($new_password, PASSWORD_DEFAULT);
                 }
 
                 if ($this->User_model->update_user($user_id, $data)) {
@@ -170,6 +181,13 @@ class Admin extends CI_Controller
         // Enforce POST method for deletion
         if ($this->input->method() !== 'post') {
             show_error('Method Not Allowed', 405);
+        }
+        
+        // Validate user_id is a positive integer
+        $user_id = intval($user_id);
+        if ($user_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid user ID.');
+            redirect('admin/users');
         }
 
         // Prevent deleting own account
@@ -200,6 +218,13 @@ class Admin extends CI_Controller
         if ($this->input->method() !== 'post') {
             show_error('Method Not Allowed', 405);
         }
+        
+        // Validate course_id is a positive integer
+        $course_id = intval($course_id);
+        if ($course_id <= 0) {
+            $this->session->set_flashdata('error', 'Invalid course ID.');
+            redirect('admin/courses');
+        }
 
         if ($this->Course_model->delete_course($course_id)) {
             $this->session->set_flashdata('success', 'Course deleted successfully!');
@@ -213,16 +238,28 @@ class Admin extends CI_Controller
     public function settings()
     {
         if ($this->input->method() == 'post') {
-            // Field mapping
+            // Validate settings inputs
+            $this->form_validation->set_rules('system_name', 'System Name', 'required|trim|max_length[100]');
+            $this->form_validation->set_rules('system_email', 'System Email', 'required|trim|valid_email|max_length[255]');
+            $this->form_validation->set_rules('timezone', 'Timezone', 'required|trim|max_length[50]');
+            $this->form_validation->set_rules('max_file_size', 'Max File Size', 'required|integer|greater_than[0]|less_than[102400]');
+            $this->form_validation->set_rules('max_students_per_course', 'Max Students', 'required|integer|greater_than[0]|less_than[10000]');
+            
+            if (!$this->form_validation->run()) {
+                $this->session->set_flashdata('error', validation_errors());
+                redirect('admin/settings');
+            }
+            
+            // Sanitized field mapping
             $settings_data = [
-                'system_name' => $this->input->post('system_name'),
-                'system_email' => $this->input->post('system_email'),
-                'timezone' => $this->input->post('timezone'),
+                'system_name' => sanitize_string($this->input->post('system_name', TRUE)),
+                'system_email' => strtolower(trim($this->input->post('system_email', TRUE))),
+                'timezone' => sanitize_string($this->input->post('timezone', TRUE)),
                 'notify_registration' => $this->input->post('notify_registration') ? 1 : 0,
                 'notify_enrollment' => $this->input->post('notify_enrollment') ? 1 : 0,
                 'notify_assignment' => $this->input->post('notify_assignment') ? 1 : 0,
-                'max_file_size' => $this->input->post('max_file_size'),
-                'max_students_per_course' => $this->input->post('max_students_per_course'),
+                'max_file_size' => intval($this->input->post('max_file_size')),
+                'max_students_per_course' => intval($this->input->post('max_students_per_course')),
             ];
 
             foreach ($settings_data as $key => $value) {

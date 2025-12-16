@@ -185,7 +185,7 @@
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form method="post" action="<?= base_url('teacher/grade_submission/' . $submission->id) ?>">
+                    <?= form_open('teacher/grade_submission/' . $submission->id) ?>
                         <div class="modal-body">
                             <div class="row mb-3">
                                 <div class="col-md-6">
@@ -265,7 +265,7 @@
                                 <i class="bi bi-save"></i> Save Grade
                             </button>
                         </div>
-                    </form>
+                    <?= form_close() ?>
                 </div>
             </div>
         </div>
