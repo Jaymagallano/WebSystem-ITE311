@@ -56,9 +56,6 @@
                     <label for="role" class="form-label">Role *</label>
                     <select class="form-select" id="role" name="role" required>
                         <option value="">Select Role...</option>
-                        <?php if ($this->session->userdata('user_id') == 1): ?>
-                            <option value="admin" <?= set_select('role', 'admin') ?>>Admin</option>
-                        <?php endif; ?>
                         <option value="teacher" <?= set_select('role', 'teacher') ?>>Teacher</option>
                         <option value="student" <?= set_select('role', 'student') ?>>Student</option>
                     </select>

@@ -102,7 +102,7 @@ class Admin extends CI_Controller
             $this->session->set_flashdata('error', 'Invalid user ID.');
             redirect('admin/users');
         }
-        
+
         $edit_user = $this->User_model->get_user_by_id($user_id);
 
         if (!$edit_user) {
@@ -182,7 +182,7 @@ class Admin extends CI_Controller
         if ($this->input->method() !== 'post') {
             show_error('Method Not Allowed', 405);
         }
-        
+
         // Validate user_id is a positive integer
         $user_id = intval($user_id);
         if ($user_id <= 0) {
@@ -218,7 +218,7 @@ class Admin extends CI_Controller
         if ($this->input->method() !== 'post') {
             show_error('Method Not Allowed', 405);
         }
-        
+
         // Validate course_id is a positive integer
         $course_id = intval($course_id);
         if ($course_id <= 0) {
@@ -244,12 +244,12 @@ class Admin extends CI_Controller
             $this->form_validation->set_rules('timezone', 'Timezone', 'required|trim|max_length[50]');
             $this->form_validation->set_rules('max_file_size', 'Max File Size', 'required|integer|greater_than[0]|less_than[102400]');
             $this->form_validation->set_rules('max_students_per_course', 'Max Students', 'required|integer|greater_than[0]|less_than[10000]');
-            
+
             if (!$this->form_validation->run()) {
                 $this->session->set_flashdata('error', validation_errors());
                 redirect('admin/settings');
             }
-            
+
             // Sanitized field mapping
             $settings_data = [
                 'system_name' => sanitize_string($this->input->post('system_name', TRUE)),

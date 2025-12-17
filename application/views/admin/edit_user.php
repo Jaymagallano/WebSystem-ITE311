@@ -43,14 +43,12 @@
                     <label for="role" class="form-label">Role *</label>
                     <select class="form-select" id="role" name="role" required <?= (isset($is_self_edit) && $is_self_edit) || (isset($disable_admin_role) && $disable_admin_role) ? 'data-restricted="true"' : '' ?>>
                         
-                        <?php // Show Admin option ONLY if functionality warrants it (user is Admin OR Super Admin is editing) ?>
-                        <?php if ($edit_user->role == 'admin' || $this->session->userdata('user_id') == 1): ?>
-                            <option value="admin" <?= set_select('role', 'admin', $edit_user->role == 'admin') ?>
-                                <?= isset($disable_admin_role) && $disable_admin_role ? 'disabled' : '' ?>>Admin</option>
-                        <?php endif; ?>
-                            
-                        <?php // Show Teacher/Student options if functionality warrants it (user is NOT Admin OR Super Admin is editing) ?>
-                        <?php if ($edit_user->role != 'admin' || $this->session->userdata('user_id') == 1): ?>
+                        <?php // Show Admin option ONLY when editing an admin user ?>
+                        <?php if ($edit_user->role == 'admin'): ?>
+                            <option value="admin" <?= set_select('role', 'admin', $edit_user->role == 'admin') ?>>Admin</option>
+                        <?php else: ?>
+                            <?php // Show Teacher/Student options when editing teacher or student users ?>
+                            <option value="">Select a role</option>
                             <option value="teacher" <?= set_select('role', 'teacher', $edit_user->role == 'teacher') ?>>Teacher</option>
                             <option value="student" <?= set_select('role', 'student', $edit_user->role == 'student') ?>>Student</option>
                         <?php endif; ?>
