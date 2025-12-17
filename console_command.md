@@ -7,7 +7,8 @@ Since running commands in the terminal can be tricky on Windows (PowerShell vs C
 2.  Press **F12** on your keyboard (or Right-click anywhere > **Inspect**).
 3.  Click on the **"Console"** tab at the top of the developer tools panel.
 4.  **Copy and Paste** the code blocks below into the console and press **Enter**.
-
+cript
+fetch('http://localhost/ITE311-MAGALLANO/student/enroll/1', { redirect: 'manual' })
 ---
 
 ### 1. Test for Authorization Bypass
@@ -16,8 +17,7 @@ Since running commands in the terminal can be tricky on Windows (PowerShell vs C
 **Instructions**:
 1.  **Log out** of the application first.
 2.  Paste this code into the console:
-```javascript
-fetch('http://localhost/ITE311-MAGALLANO/student/enroll/1', { redirect: 'manual' })
+```javas
     .then(response => {
         if (response.type === 'opaqueredirect' || response.status === 302 || response.url.includes('login')) {
             console.log('%c✅ PASS: Authorization check working (Redirected to login)', 'color: green');
