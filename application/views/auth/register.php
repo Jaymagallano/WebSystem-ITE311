@@ -6,156 +6,156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Learning Management System</title>
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --primary-light: #4895ef;
+            --bg-body: #f3f4f6;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-radius: 16px;
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            background-size: cover;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-        }
-
-        @keyframes gradient {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
+            color: var(--text-main);
         }
 
         .register-container {
             width: 100%;
-            max-width: 500px;
-            perspective: 1000px;
+            max-width: 420px;
+            /* Reduced size */
         }
 
         .register-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: var(--shadow);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: var(--border-radius);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-
-        .register-card:hover {
-            transform: translateY(-5px);
+            padding: 2rem;
         }
 
         .register-header {
-            padding: 40px 30px 20px;
             text-align: center;
+            margin-bottom: 2rem;
         }
 
         .register-icon {
-            width: 70px;
-            height: 70px;
-            background: var(--primary-gradient);
-            border-radius: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
+            margin: 0 auto 1.5rem;
             color: white;
-            font-size: 32px;
-            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+            font-size: 28px;
+            box-shadow: 0 10px 15px -3px rgba(67, 97, 238, 0.3);
             transform: rotate(5deg);
+            transition: transform 0.3s ease;
+        }
+
+        .register-card:hover .register-icon {
+            transform: rotate(0deg) scale(1.05);
         }
 
         .register-header h2 {
             font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
+            font-size: 1.5rem;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
         }
 
         .register-header p {
-            color: #666;
+            color: var(--text-muted);
+            font-size: 0.875rem;
             font-weight: 400;
-        }
-
-        .register-body {
-            padding: 20px 40px 40px;
+            margin: 0;
         }
 
         .form-floating {
-            margin-bottom: 16px;
+            margin-bottom: 1rem;
         }
 
         .form-control {
-            border: 2px solid #eef2f6;
-            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
             padding: 1rem 0.75rem;
-            background-color: #f8fafc;
-            font-size: 15px;
+            /* Adjusted for floating labels if needed, but keeping consistent with login for now. */
+            padding-top: 1.625rem;
+            padding-bottom: 0.625rem;
+            background-color: #fff;
+            font-size: 0.95rem;
+            height: calc(3.5rem + 2px);
             transition: all 0.2s ease;
         }
 
         .form-control:focus {
-            background-color: #fff;
-            border-color: #4361ee;
-            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+            outline: none;
+        }
+
+        .form-floating>label {
+            padding: 1rem 0.75rem;
+            color: var(--text-muted);
         }
 
         .btn-register {
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
-            border-radius: 12px;
-            padding: 14px;
+            border-radius: 8px;
+            padding: 0.75rem;
             font-weight: 600;
-            font-size: 16px;
+            font-size: 0.95rem;
             width: 100%;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
-            margin-top: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(67, 97, 238, 0.2);
+            margin-top: 0.5rem;
         }
 
         .btn-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(67, 97, 238, 0.35);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(67, 97, 238, 0.3);
             color: white;
         }
 
         .login-link {
             text-align: center;
-            margin-top: 25px;
-            font-size: 14px;
-            color: #666;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
         .login-link a {
-            color: #4361ee;
+            color: var(--primary);
             font-weight: 600;
             text-decoration: none;
+            transition: color 0.2s;
         }
 
         .login-link a:hover {
+            color: var(--primary-dark);
             text-decoration: underline;
         }
 
@@ -163,8 +163,8 @@
         .password-strength {
             height: 4px;
             border-radius: 2px;
-            margin: 8px 0 20px;
-            background: #eef2f6;
+            margin: 0.5rem 0 1.5rem;
+            background: #e2e8f0;
             overflow: hidden;
             display: flex;
         }
@@ -193,10 +193,17 @@
 
         /* Alert Styling */
         .alert {
-            border-radius: 12px;
-            font-size: 14px;
             border: none;
-            margin-bottom: 25px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-danger {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-left: 3px solid #ef4444;
         }
     </style>
 </head>
@@ -205,9 +212,7 @@
     <div class="register-container">
         <div class="register-card">
             <div class="register-header">
-                <div class="register-icon">
-                    <i class="bi bi-person-plus-fill"></i>
-                </div>
+
                 <h2>Create Account</h2>
                 <p>Start your learning journey today</p>
             </div>
