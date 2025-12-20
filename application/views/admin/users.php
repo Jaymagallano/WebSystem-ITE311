@@ -31,43 +31,51 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <div class="row g-3">
+                <?= form_open('admin/users', ['method' => 'get', 'id' => 'userFilterForm', 'class' => 'row g-3 align-items-end']) ?>
                     <div class="col-md-6">
                         <label for="searchInput" class="form-label">
                             <i class="bi bi-search"></i> Search
                         </label>
-                        <input type="text" class="form-control" id="searchInput"
-                            placeholder="Search by name, email, or ID...">
+                        <input type="text" class="form-control" id="searchInput" name="q"
+                            placeholder="Search by name, email, or ID..."
+                            value="<?= isset($filters['q']) ? html_escape($filters['q']) : '' ?>">
                     </div>
                     <div class="col-md-3">
                         <label for="roleFilter" class="form-label">
                             <i class="bi bi-shield"></i> Role
                         </label>
-                        <select class="form-select" id="roleFilter">
-                            <option value="">All Roles</option>
-                            <option value="admin">Admin</option>
-                            <option value="teacher">Teacher</option>
-                            <option value="student">Student</option>
+                        <select class="form-select" id="roleFilter" name="role">
+                            <option value="" <?= empty($filters['role']) ? 'selected' : '' ?>>All Roles</option>
+                            <option value="admin" <?= (isset($filters['role']) && $filters['role'] === 'admin') ? 'selected' : '' ?>>Admin</option>
+                            <option value="teacher" <?= (isset($filters['role']) && $filters['role'] === 'teacher') ? 'selected' : '' ?>>Teacher</option>
+                            <option value="student" <?= (isset($filters['role']) && $filters['role'] === 'student') ? 'selected' : '' ?>>Student</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label for="sortBy" class="form-label">
                             <i class="bi bi-sort-down"></i> Sort By
                         </label>
-                        <select class="form-select" id="sortBy">
-                            <option value="name">Name</option>
-                            <option value="email">Email</option>
-                            <option value="role">Role</option>
-                            <option value="date">Date</option>
+                        <select class="form-select" id="sortBy" name="sort">
+                            <?php $currentSort = $filters['sort'] ?? 'date'; ?>
+                            <option value="name" <?= $currentSort === 'name' ? 'selected' : '' ?>>Name</option>
+                            <option value="email" <?= $currentSort === 'email' ? 'selected' : '' ?>>Email</option>
+                            <option value="role" <?= $currentSort === 'role' ? 'selected' : '' ?>>Role</option>
+                            <option value="date" <?= $currentSort === 'date' ? 'selected' : '' ?>>Date</option>
                         </select>
                     </div>
-                </div>
-                <div class="mt-3">
-                    <span class="text-muted">
-                        <i class="bi bi-info-circle"></i>
-                        Showing <strong id="resultCount"><?= count($users) ?></strong> user(s)
-                    </span>
-                </div>
+                    <div class="col-md-1 d-flex gap-2 justify-content-end">
+                        <button type="submit" class="btn btn-primary w-100" id="applyServerFilter">
+                            <i class="bi bi-funnel"></i>
+                        </button>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <span class="text-muted">
+                            <i class="bi bi-info-circle"></i>
+                            Showing <strong id="resultCount"><?= count($users) ?></strong> user(s)
+                            <span class="ms-2 small text-secondary">(server + client filters)</span>
+                        </span>
+                    </div>
+                <?= form_close() ?>
             </div>
         </div>
     </div>
@@ -148,92 +156,96 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const searchInput = document.getElementById('searchInput');
-        const roleFilter = document.getElementById('roleFilter');
-        const sortBy = document.getElementById('sortBy');
-        const tableBody = document.getElementById('usersTableBody');
-        const resultCount = document.getElementById('resultCount');
+    $(function () {
+        const $searchInput = $('#searchInput');
+        const $roleFilter = $('#roleFilter');
+        const $sortBy = $('#sortBy');
+        const $tableBody = $('#usersTableBody');
+        const $resultCount = $('#resultCount');
+        const $form = $('#userFilterForm');
 
-        // Get all user rows
-        let allRows = Array.from(document.querySelectorAll('.user-row'));
+        // Cache original rows for client-side filtering
+        let allRows = $tableBody.find('.user-row').toArray();
 
-        // Filter and sort function
-        function filterAndSort() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            const selectedRole = roleFilter.value;
-            const sortField = sortBy.value;
+        function applyClientFilter() {
+            const searchTerm = $searchInput.val().toLowerCase().trim();
+            const selectedRole = $roleFilter.val();
+            const sortField = $sortBy.val();
 
-            // Filter rows
             let visibleRows = allRows.filter(row => {
-                const name = row.dataset.name;
-                const email = row.dataset.email;
-                const id = row.dataset.id;
-                const role = row.dataset.role;
+                const $row = $(row);
+                const name = $row.data('name');
+                const email = $row.data('email');
+                const id = String($row.data('id'));
+                const role = $row.data('role');
 
-                // Search filter
-                const matchesSearch = searchTerm === '' ||
-                    name.includes(searchTerm) ||
-                    email.includes(searchTerm) ||
-                    id.includes(searchTerm);
+                const matchesSearch = !searchTerm ||
+                    (name && name.indexOf(searchTerm) !== -1) ||
+                    (email && email.indexOf(searchTerm) !== -1) ||
+                    (id && id.indexOf(searchTerm) !== -1);
 
-                // Role filter
-                const matchesRole = selectedRole === '' || role === selectedRole;
+                const matchesRole = !selectedRole || role === selectedRole;
 
                 return matchesSearch && matchesRole;
             });
 
-            // Sort rows
             visibleRows.sort((a, b) => {
+                const $a = $(a);
+                const $b = $(b);
                 let aVal, bVal;
 
                 switch (sortField) {
                     case 'name':
-                        aVal = a.dataset.name;
-                        bVal = b.dataset.name;
+                        aVal = $a.data('name');
+                        bVal = $b.data('name');
                         return aVal.localeCompare(bVal);
                     case 'email':
-                        aVal = a.dataset.email;
-                        bVal = b.dataset.email;
+                        aVal = $a.data('email');
+                        bVal = $b.data('email');
                         return aVal.localeCompare(bVal);
                     case 'role':
-                        aVal = a.dataset.role;
-                        bVal = b.dataset.role;
+                        aVal = $a.data('role');
+                        bVal = $b.data('role');
                         return aVal.localeCompare(bVal);
                     case 'date':
-                        aVal = parseInt(a.dataset.date);
-                        bVal = parseInt(b.dataset.date);
-                        return bVal - aVal; // Newest first
                     default:
-                        return 0;
+                        aVal = parseInt($a.data('date'), 10) || 0;
+                        bVal = parseInt($b.data('date'), 10) || 0;
+                        return bVal - aVal; // Newest first
                 }
             });
 
-            // Clear table
-            tableBody.innerHTML = '';
+            $tableBody.empty();
 
-            // Display filtered and sorted rows
             if (visibleRows.length > 0) {
-                visibleRows.forEach(row => {
-                    tableBody.appendChild(row);
-                });
+                visibleRows.forEach(row => $tableBody.append(row));
             } else {
-                tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4"><i class="bi bi-inbox" style="font-size: 2rem; color: #ccc;"></i><p class="mt-2 text-muted">No users found matching your criteria</p></td></tr>';
+                $tableBody.html('<tr><td colspan="6" class="text-center py-4"><i class="bi bi-inbox" style="font-size: 2rem; color: #ccc;"></i><p class="mt-2 text-muted">No users found matching your criteria</p></td></tr>');
             }
 
-            // Update count
-            resultCount.textContent = visibleRows.length;
-
-
+            $resultCount.text(visibleRows.length);
         }
 
-        // Event listeners
-        searchInput.addEventListener('keyup', filterAndSort);
-        roleFilter.addEventListener('change', filterAndSort);
-        sortBy.addEventListener('change', filterAndSort);
+        // Client-side live filters
+        $searchInput.on('keyup', function () {
+            applyClientFilter();
+        });
 
-        // Initial load
-        filterAndSort();
+        $roleFilter.on('change', function () {
+            applyClientFilter();
+        });
+
+        $sortBy.on('change', function () {
+            applyClientFilter();
+        });
+
+        // Submit to server when the form is submitted (for server-side filtering)
+        $form.on('submit', function () {
+            // allow normal GET submit – server will pre-filter results
+        });
+
+        // Initial filter on page load (client-side refinement of server results)
+        applyClientFilter();
     });
 </script>
 

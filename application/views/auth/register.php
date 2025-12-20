@@ -12,22 +12,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 
     <style>
-        :root {
-            --primary: #4361ee;
-            --primary-dark: #3a0ca3;
-            --primary-light: #4895ef;
-            --bg-body: #f3f4f6;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
+:root {
+            /* Match IntelliJ-like dark palette used in admin-theme.css */
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --primary-light: #60a5fa;
+            --bg-body: #020617;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
             --border-radius: 16px;
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.95);
         }
 
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: #f8fafc;
-            background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
-            background-size: cover;
+            background: radial-gradient(circle at top, #111827 0, #020617 45%, #020617 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -42,12 +41,12 @@
             /* Reduced size */
         }
 
-        .register-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+.register-card {
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(148, 163, 184, 0.35);
             border-radius: var(--border-radius);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
             padding: 2rem;
         }
@@ -77,10 +76,10 @@
             transform: rotate(0deg) scale(1.05);
         }
 
-        .register-header h2 {
+.register-header h2 {
             font-weight: 700;
             font-size: 1.5rem;
-            color: #0f172a;
+            color: var(--text-light);
             margin-bottom: 0.5rem;
             letter-spacing: -0.025em;
         }
@@ -96,22 +95,22 @@
             margin-bottom: 1rem;
         }
 
-        .form-control {
-            border: 1px solid #e2e8f0;
+.form-control {
+            border: 1px solid rgba(55, 65, 81, 0.9);
             border-radius: 8px;
             padding: 1rem 0.75rem;
             /* Adjusted for floating labels if needed, but keeping consistent with login for now. */
             padding-top: 1.625rem;
             padding-bottom: 0.625rem;
-            background-color: #fff;
+            background-color: #020617;
             font-size: 0.95rem;
             height: calc(3.5rem + 2px);
             transition: all 0.2s ease;
         }
 
-        .form-control:focus {
+.form-control:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
             outline: none;
         }
 
@@ -200,9 +199,9 @@
             margin-bottom: 1.5rem;
         }
 
-        .alert-danger {
-            background-color: #fef2f2;
-            color: #991b1b;
+.alert-danger {
+            background-color: rgba(127, 29, 29, 0.85);
+            color: #fee2e2;
             border-left: 3px solid #ef4444;
         }
     </style>

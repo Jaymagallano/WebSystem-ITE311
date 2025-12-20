@@ -16,6 +16,31 @@ class Notifications extends CI_Controller {
         
         $this->load->model('Notification_model');
     }
+
+    /**
+     * Default notifications page - route: /notifications
+     * Renders role-specific notifications view (admin/teacher/student).
+     */
+    public function index()
+    {
+        $role = $this->session->userdata('role');
+
+        switch ($role) {
+            case 'admin':
+                $this->load->view('admin/notifications');
+                break;
+            case 'teacher':
+                $this->load->view('teacher/notifications');
+                break;
+            case 'student':
+                $this->load->view('student/notifications');
+                break;
+            default:
+                // Fallback: send user back to dashboard if role is unknown
+                redirect('dashboard');
+                break;
+        }
+    }
     
     /**
      * Get unread notifications (AJAX)

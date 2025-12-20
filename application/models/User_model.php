@@ -15,6 +15,48 @@ class User_model extends CI_Model
         return $this->db->order_by('created_at', 'DESC')->get('users')->result();
     }
 
+    /**
+     * Get users with optional server-side filtering and sorting.
+     *
+     * @param string|null $search Free-text search (name, email, id)
+     * @param string|null $role   Filter by role (admin, teacher, student)
+     * @param string      $sort   Sort key: name|email|role|date
+     * @return array
+     */
+    public function get_users_filtered($search = null, $role = null, $sort = 'date')
+    {
+        if (!empty($role)) {
+            $this->db->where('role', $role);
+        }
+
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like('name', $search);
+            $this->db->or_like('email', $search);
+            // cast id to char for LIKE search; safe because CI escapes values
+            $this->db->or_like('id', $search);
+            $this->db->group_end();
+        }
+
+        switch ($sort) {
+            case 'name':
+                $this->db->order_by('name', 'ASC');
+                break;
+            case 'email':
+                $this->db->order_by('email', 'ASC');
+                break;
+            case 'role':
+                $this->db->order_by('role', 'ASC');
+                break;
+            case 'date':
+            default:
+                $this->db->order_by('created_at', 'DESC');
+                break;
+        }
+
+        return $this->db->get('users')->result();
+    }
+
     // Get a specific user by ID
     public function get_user_by_id($id)
     {

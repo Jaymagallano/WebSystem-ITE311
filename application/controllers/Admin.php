@@ -30,7 +30,20 @@ class Admin extends CI_Controller
     public function users()
     {
         $data['user'] = $this->session->userdata();
-        $data['users'] = $this->User_model->get_all_users();
+
+        // Server-side filters from query string
+        $search = trim($this->input->get('q', TRUE) ?? '');
+        $role   = trim($this->input->get('role', TRUE) ?? '');
+        $sort   = trim($this->input->get('sort', TRUE) ?? 'date');
+
+        $data['filters'] = [
+            'q'    => $search,
+            'role' => $role,
+            'sort' => $sort,
+        ];
+
+        $data['users'] = $this->User_model->get_users_filtered($search, $role, $sort);
+
         $this->load->view('admin/users', $data);
     }
 

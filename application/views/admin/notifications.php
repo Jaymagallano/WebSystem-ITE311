@@ -1,4 +1,4 @@
-<?= $this->load->view('templates/header', ['page_title' => 'My Notifications']) ?>
+<?php $this->load->view('templates/header', ['page_title' => 'My Notifications']); ?>
 
 <div class="row">
     <div class="col-12">
@@ -18,7 +18,7 @@
     </div>
 </div>
 
-<?= $this->load->view('templates/footer') ?>
+<?php $this->load->view('templates/footer'); ?>
 
 <script>
 $(document).ready(function() {

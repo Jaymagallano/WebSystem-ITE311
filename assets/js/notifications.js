@@ -25,30 +25,16 @@ function initializeNotificationSystem() {
     // Auto-refresh notifications every 30 seconds
     setInterval(loadNotifications, 30000);
     
-    // Toggle notification dropdown using event delegation for better reliability
-    $(document).on('click', '#notification-bell', function(e) {
-        e.stopPropagation();
-        console.log('Notification bell clicked'); // Debug log
-        $('#notification-dropdown').toggleClass('show');
-        // If opening, load fresh notifications
-        if ($('#notification-dropdown').hasClass('show')) {
-            loadNotifications();
-        }
+    // When the Bootstrap dropdown is toggled, refresh notifications
+    $(document).on('click', '#notificationDropdown', function (e) {
+        // Let Bootstrap handle open/close; just load fresh data
+        loadNotifications();
     });
-    
-    // Also bind click to the icon itself using event delegation
-    $(document).on('click', '#notification-bell i', function(e) {
-        e.stopPropagation();
-        console.log('Notification icon clicked'); // Debug log
-        // Trigger the bell click event
-        $('#notification-bell').trigger('click');
-    });
-    
-    // Close dropdown when clicking outside
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('#notification-container').length) {
-            $('#notification-dropdown').removeClass('show');
-        }
+
+    // Also bind click to the bell icon itself
+    $(document).on('click', '#notificationDropdown i', function (e) {
+        // Delegate to the parent anchor
+        $('#notificationDropdown').trigger('click');
     });
     
     // Mark all as read
@@ -245,9 +231,9 @@ function initializeNotificationSystem() {
      * View all notifications
      */
     function viewAllNotifications() {
-        // Close dropdown
-        $('#notification-dropdown').removeClass('show');
-        // Redirect to notifications page (you can customize this URL)
+        // Let Bootstrap close the dropdown via data-bs-toggle
+        $('.notification-dropdown').removeClass('show');
+        // Redirect to notifications page
         window.location.href = baseUrl + 'notifications';
     }
     

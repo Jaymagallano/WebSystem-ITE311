@@ -17,15 +17,15 @@
 <!-- Welcome Section -->
 <div class="row mb-4">
     <div class="col-12">
-        <div class="card" style="background: var(--primary-color); color: white; border: none;">
+        <div class="card bg-gradient-primary text-white border-0 shadow-md rounded-lg">
             <div class="card-body p-4">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <h4 class="mb-1 fw-normal">Welcome, <?= $user['name'] ?></h4>
-                        <p class="mb-0 small">Dashboard Overview</p>
-                    </div>
+                <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <i class="bi bi-person-circle" style="font-size: 4rem; opacity: 0.3;"></i>
+                        <h4 class="mb-1 fw-semibold">Welcome, <?= $user['name'] ?></h4>
+                        <p class="mb-0 small opacity-75"><?= ucfirst($user['role']) ?> dashboard overview</p>
+                    </div>
+                    <div class="d-none d-md-block">
+                        <i class="bi bi-person-circle" style="font-size: 3.2rem; opacity: 0.3;"></i>
                     </div>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                             <h6 class="text-muted mb-2 fw-semibold">Total Users</h6>
                             <h3 class="mb-0 fw-bold"><?= isset($total_users) ? $total_users : 0 ?></h3>
                         </div>
-                        <div class="text-primary" style="font-size: 2.5rem; color: #3182ce !important;">
+                        <div class="stat-icon text-primary">
                             <i class="bi bi-people-fill"></i>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                             <h6 class="text-muted mb-2 fw-semibold">Admins</h6>
                             <h3 class="mb-0 fw-bold"><?= isset($total_admins) ? $total_admins : 0 ?></h3>
                         </div>
-                        <div class="text-danger" style="font-size: 2.5rem; color: #c53030 !important;">
+                        <div class="stat-icon text-danger">
                             <i class="bi bi-shield-fill-check"></i>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
                             <h6 class="text-muted mb-2 fw-semibold">Teachers</h6>
                             <h3 class="mb-0 fw-bold"><?= isset($total_teachers) ? $total_teachers : 0 ?></h3>
                         </div>
-                        <div class="text-info" style="font-size: 2.5rem; color: #2c7a7b !important;">
+                        <div class="stat-icon text-info">
                             <i class="bi bi-person-badge-fill"></i>
                         </div>
                     </div>
@@ -92,7 +92,7 @@
                             <h6 class="text-muted mb-2 fw-semibold">Students</h6>
                             <h3 class="mb-0 fw-bold"><?= isset($total_students) ? $total_students : 0 ?></h3>
                         </div>
-                        <div class="text-success" style="font-size: 2.5rem; color: #2f855a !important;">
+                        <div class="stat-icon text-success">
                             <i class="bi bi-mortarboard-fill"></i>
                         </div>
                     </div>
@@ -161,8 +161,7 @@
             <div class="card">
                 <div class="card-body text-center p-4">
                     <div class="mb-3">
-                        <i class="bi bi-person-plus-fill"
-                            style="font-size: 3.5rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                        <i class="bi bi-person-plus-fill stat-quick-icon text-primary"></i>
                     </div>
                     <h5 class="fw-bold mb-2">Add New User</h5>
                     <p class="text-muted mb-3">Create a new user account</p>
@@ -176,8 +175,7 @@
             <div class="card">
                 <div class="card-body text-center p-4">
                     <div class="mb-3">
-                        <i class="bi bi-book-fill"
-                            style="font-size: 3.5rem; background: var(--warning-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                        <i class="bi bi-book-fill stat-quick-icon text-warning"></i>
                     </div>
                     <h5 class="fw-bold mb-2">Manage Courses</h5>
                     <p class="text-muted mb-3">View and edit all courses</p>
@@ -191,8 +189,7 @@
             <div class="card">
                 <div class="card-body text-center p-4">
                     <div class="mb-3">
-                        <i class="bi bi-bar-chart-fill"
-                            style="font-size: 3.5rem; background: var(--secondary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+                        <i class="bi bi-bar-chart-fill stat-quick-icon text-danger"></i>
                     </div>
                     <h5 class="fw-bold mb-2">System Reports</h5>
                     <p class="text-muted mb-3">Generate system reports</p>
@@ -216,7 +213,7 @@
                             <h3 class="mb-0 fw-bold"><?= isset($total_students) ? $total_students : 0 ?></h3>
                             <small class="text-success"><i class="bi bi-arrow-up"></i> Active learners</small>
                         </div>
-                        <div class="text-success" style="font-size: 2.5rem; color: #2f855a !important;">
+                        <div class="stat-icon text-success">
                             <i class="bi bi-people-fill"></i>
                         </div>
                     </div>
@@ -233,7 +230,7 @@
                             <h3 class="mb-0 fw-bold"><?= isset($total_courses) ? $total_courses : 0 ?></h3>
                             <small class="text-info"><i class="bi bi-book"></i> Published courses</small>
                         </div>
-                        <div class="text-info" style="font-size: 2.5rem; color: #2c7a7b !important;">
+                        <div class="stat-icon text-info">
                             <i class="bi bi-journal-bookmark-fill"></i>
                         </div>
                     </div>
@@ -250,7 +247,7 @@
                             <h3 class="mb-0 fw-bold"><?= isset($total_assignments) ? $total_assignments : 0 ?></h3>
                             <small class="text-primary"><i class="bi bi-clipboard-check"></i> Active tasks</small>
                         </div>
-                        <div class="text-primary" style="font-size: 2.5rem; color: #3182ce !important;">
+                        <div class="stat-icon text-primary">
                             <i class="bi bi-clipboard-check-fill"></i>
                         </div>
                     </div>
@@ -300,9 +297,8 @@
         </div>
 
         <div class="col-md-4">
-            <div class="card">
-                <div class="card-header border-0"
-                    style="background: var(--primary-gradient); color: white; border-radius: 0px;">
+                    <div class="card">
+                <div class="card-header border-0 bg-gradient-primary text-white">
                     <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill me-2"></i>Quick Actions</h5>
                 </div>
                 <div class="card-body p-4">
@@ -363,7 +359,7 @@
                             <h3 class="mb-0 fw-bold"><?= isset($total_teachers) ? $total_teachers : 0 ?></h3>
                             <small class="text-info"><i class="bi bi-mortarboard"></i> Expert instructors</small>
                         </div>
-                        <div class="text-info" style="font-size: 2.5rem; color: #2c7a7b !important;">
+                        <div class="stat-icon text-info">
                             <i class="bi bi-person-badge-fill"></i>
                         </div>
                     </div>
@@ -381,7 +377,7 @@
                             </h3>
                             <small class="text-success"><i class="bi bi-bookmark-check"></i> Active learning</small>
                         </div>
-                        <div class="text-success" style="font-size: 2.5rem; color: #2f855a !important;">
+                        <div class="stat-icon text-success">
                             <i class="bi bi-book-fill"></i>
                         </div>
                     </div>
@@ -399,7 +395,7 @@
                                 <?= isset($total_pending_assignments) ? $total_pending_assignments : 0 ?></h3>
                             <small class="text-primary"><i class="bi bi-clock"></i> To complete</small>
                         </div>
-                        <div class="text-primary" style="font-size: 2.5rem; color: #3182ce !important;">
+                        <div class="stat-icon text-primary">
                             <i class="bi bi-clipboard-check-fill"></i>
                         </div>
                     </div>

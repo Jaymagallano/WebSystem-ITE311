@@ -1212,15 +1212,17 @@ class Teacher extends CI_Controller
         $result = $this->db->get()->row();
         $data['total_submissions'] = $result->total;
 
-        // Average grade across all courses
-        $this->db->select_avg('assignment_submissions.points_earned');
+        // Average grade across all courses (use existing score column)
+        $this->db->select_avg('assignment_submissions.score');
         $this->db->from('assignment_submissions');
         $this->db->join('assignments', 'assignment_submissions.assignment_id = assignments.id');
         $this->db->join('courses', 'assignments.course_id = courses.id');
         $this->db->where('courses.teacher_id', $teacher_id);
-        $this->db->where('assignment_submissions.status', 'graded');
+        // Count only graded submissions: graded_at not null and score not null
+        $this->db->where('assignment_submissions.graded_at IS NOT NULL', null, false);
+        $this->db->where('assignment_submissions.score IS NOT NULL', null, false);
         $result = $this->db->get()->row();
-        $data['average_grade'] = $result->points_earned ?? 0;
+        $data['average_grade'] = $result && isset($result->score) ? $result->score : 0;
 
         $this->load->view('teacher/reports', $data);
     }
